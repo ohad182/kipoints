@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { io } from "socket.io-client";
+import { createContext, useContext, useEffect, useState } from 'react';
+import { io } from 'socket.io-client';
 
 const SocketContext = createContext();
 
@@ -10,7 +10,7 @@ export const SocketProvider = ({ children }) => {
   const [connected, setConnected] = useState(false);
 
     useEffect(() => {
-    const newSocket = io("http://localhost:3000");
+    const newSocket = io('http://localhost:3000');
 
     newSocket.on("connect", () => {
         console.log("Connected to WebSocket server");

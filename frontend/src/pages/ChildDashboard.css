@@ -1,0 +1,158 @@
+.child-dashboard {
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+.back-button {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.back-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.dashboard-header h1 {
+    color:white;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.balance-display {
+    background: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 3rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.balance-label {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.balance-amount {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.tasks-section, .rewards-section {
+    max-width: 1200px;
+    margin: 0 auto 3rem;
+}
+
+.tasks-section h2, .rewards-section h2 {
+    color: white;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.task-category {
+    margin-bottom: 2rem;
+}
+
+.task-category h3 {
+    color: white;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.tasks-grid, .rewards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+}
+
+.task-card, .reward-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.task-card:hover, .reward-card:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.task-card:active {
+    animation: pop 0.3 ease;
+}
+
+@keyframes pop {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+.task-icon, .reward-image {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.task-name, .reward-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.task-points {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.reward-cost {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.reward-card.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.reward-card.disabled:hover {
+    transform: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.loading {
+    color: white;
+    font-size: 2rem;
+    text-align: center;
+    padding: 4rem
+}
+
+@media (max-width: 768px) {
+    .dashboard-header h1 {
+        font-size: 2rem;
+    }
+
+    .balance-amount {
+        font-size: 2rem;
+    }
+
+    .tasks-grid, .rewards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }   
+}
