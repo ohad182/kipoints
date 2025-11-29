@@ -74,8 +74,8 @@
 
 .tasks-grid, .rewards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
 }
 
 .task-card, .reward-card {
@@ -94,7 +94,7 @@
 }
 
 .task-card:active {
-    animation: pop 0.3 ease;
+    animation: pop 0.3s ease;
 }
 
 @keyframes pop {
@@ -117,7 +117,7 @@
 .task-points {
     font-size: 1.3rem;
     font-weight: bold;
-    color: #667eea;
+    color: #4caf50;
 }
 
 .reward-cost {
@@ -140,7 +140,7 @@
     color: white;
     font-size: 2rem;
     text-align: center;
-    padding: 4rem
+    padding: 4rem;
 }
 
 @media (max-width: 768px) {
@@ -153,6 +153,6 @@
     }
 
     .tasks-grid, .rewards-grid {
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }   
 }

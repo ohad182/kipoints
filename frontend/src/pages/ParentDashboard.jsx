@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { api } from "../api";
-import { useSocket } from "../SocketContext";
-import AddChildModal from "../components/AddChildModal";
-import AddTaskModal from "../components/AddTaskModal";
-import AddRewardModal from "../components/AddRewardModal";
-import AssignTaskModal from "../components/AssignTaskModal";
-import PenaltyModal from "../components/PenaltyModal";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { api } from '../api';
+import { useSocket } from '../SocketContext';
+import AddChildModal from '../components/AddChildModal';
+import AddTaskModal from '../components/AddTaskModal';
+import AddRewardModal from '../components/AddRewardModal';
+import AssignTaskModal from '../components/AssignTaskModal';
+import PenaltyModal from '../components/PenaltyModal';
 import './ParentDashboard.css';
 
 function ParentDashboard() {
@@ -29,10 +29,6 @@ function ParentDashboard() {
     const [editTask, setEditTask] = useState(null);
     const [editReward, setEditReward] = useState(null);
 
-
-    const [newTask, setNewTask] = useState({ name: '', category: 'other', icon: '' });
-    const [newReward, setNewReward] = useState({ name: '', cost: '', image: '' });
-
     useEffect(() => {
         loadData();
     }, []);
@@ -40,90 +36,151 @@ function ParentDashboard() {
     useEffect(() => {
         if (!socket) return;
 
-        socket.on('childAdded', (child) => {
-            setChildren(prev => [...prev, child]);
+        socket.on('transactionAdded', () => {
+            loadPendingTransactions();
+            loadChildren();
         });
 
-        socket.on('childUpdated', (child) => {
-            setChildren(prev => prev.map(c => c.id === child.id ? child : c));
+        socket.on('transactionReviewed', () => {
+            loadPendingTransactions();
+            loadChildren();
         });
 
-        socket.on('taskAdded', (task) => {
-            setTasks(prev => [...prev, task]);
-        });
+        socket.on('childAdded', () => loadChildren());
+        socket.on('taskAdded', () => loadTasks());
+        socket.on('rewardAdded', () => loadRewards());
+        socket.on('childUpdated', () => loadChildren());
+        socket.on('taskUpdated', () => loadTasks());
+        socket.on('rewardUpdated', () => loadRewards());
+        socket.on('childDeleted', () => loadChildren());
+        socket.on('taskDeleted', () => loadTasks());
+        socket.on('rewardDeleted', () => loadRewards());
+        socket.on('assignmentAdded', () => loadAllAssignments());
+        socket.on('assignmentUpdated', () => loadAllAssignments());
+        socket.on('assignmentDeleted', () => loadAllAssignments());
 
-        socket.on('rewardAdded', (reward) => {
-            setRewards(prev => [...prev, reward]);
-        });
-
-        socket.on('transactionAdded', (data) => {
-            setPendingTransactions(prev => [...prev, data.transaction]);
-        });
 
         return () => {
-            socket.off('childAdded');
-            socket.off('childUpdated');
-            socket.off('taskAdded');
-            socket.off('rewardAdded');
             socket.off('transactionAdded');
+            socket.off('transactionReviewed');
+            socket.off('childAdded');
+            socket.off('taskAdded');
+            socket.off('childUpdated');
+            socket.off('taskUpdated');
+            socket.off('rewardUpdated');
+            socket.off('childDeleted');
+            socket.off('taskDeleted');
+            socket.off('rewardAdded');
+            socket.off('rewardDeleted');
+            socket.off('assignmentAdded');
+            socket.off('assignmentUpdated');
+            socket.off('assignmentDeleted');
         };
     }, [socket]);
 
     const loadData = async () => {
+        await Promise.all([loadChildren(), loadTasks(), loadRewards(), loadPendingTransactions(), loadAllAssignments()]);
+    };
+
+    const loadChildren = async () => {
         try {
-            setLoading(true);
-            const [childrenData, tasksData, rewardsData, transactionsData] = await Promise.all([
-                api.getChildren(),
-                api.getTasks(),
-                api.getRewards(),
-                api.getPendingTransactions()
-            ]);
-            setChildren(childrenData);
-            setTasks(tasksData);
-            setRewards(rewardsData);
-            setPendingTransactions(transactionsData);
+            const data = await api.getChildren();
+            setChildren(data);
         } catch (error) {
-            console.error('Error loading data:', error);
-        } finally {
-            setLoading(false);
+            console.error('Error loading children:', error);
         }
     };
 
-    const handleAddTask = async (e) => {
-        e.preventDefault();
-        if (!newTask.name.trim()) return;
-
+    const loadTasks = async () => {
         try {
-            await api.addTask(newTask);
-            setNewTask({ name: '', category: 'other', icon: '' });
+            const data = await api.getTasks();
+            setTasks(data);
         } catch (error) {
-            console.error('Error adding task:', error);
+            console.error('Error loading tasks:', error);
         }
     };
 
-    const handleAddReward = async (e) => {
-        e.preventDefault();
-        if (!newReward.name.trim() || !newReward.cost) return;
-
+    const loadRewards = async () => {
         try {
-            await api.addReward({ ...newReward, cost: parseInt(newReward.cost) });
-            setNewReward({ name: '', cost: '', image: '' });
+            const data = await api.getRewards();
+            setRewards(data);
         } catch (error) {
-            console.error('Error adding reward:', error);
+            console.error('Error loading rewards:', error);
         }
     };
 
-    const handleDeleteTask = async (id) => {
+    const loadPendingTransactions = async () => {
+        try {
+            const data = await api.getPendingTransactions();
+            setPendingTransactions(data);
+        } catch (error) {
+            console.error('Error loading pending transactions:', error);
+        }
+    };
+
+    const loadAllAssignments = async () => {
+        // Get all assignments for all children
+        const childrenData = await api.getChildren();
+        const allAssignmentsData = [];
+
+        for (const child of childrenData) {
+            const assignments = await api.getAssignments(child.id);
+            assignments.forEach(assignment => {
+                allAssignments.push({
+                    ...assignment,
+                    childName: child.name
+                });
+            });
+        }
+        setAllAssignments(allAssignmentsData);
+    };
+
+    const addChild = async (data, editId) => {
+        if (editId) {
+            await api.updateChild(editId, data);
+        } else {
+            await api.addChild(data);
+        }
+    }
+
+    const deleteChild = async (id) => {
+        if (confirm('האם אתה בטוח שברצונך למחוק ילד זה? כל הנתונים שלו יימחקו.')) {
+            await api.deleteChild(id);
+        }
+    }
+
+    const addTask = async (data, editId) => {
+        if (editId) {
+            await api.updateTask(editId, data);
+        } else {
+            await api.addTask(data);
+        }
+    }
+
+    const deleteTask = async (id) => {
         if (confirm('האם אתה בטוח שברצונך למחוק משימה זו?')) {
-            try {
-                await api.deleteTask(id);
-            } catch (error) {
-                console.error('Error deleting task:', error);
-            }
+            await api.deleteTask(id);
         }
     };
 
-    const handleDeleteReward = async (id) => {
+    const assignTask = async (data) => {
+        try {
+            await api.addAssignment(data);
+            alert('המשימה הוקצתה בהצלחה!');
+        } catch (error) {
+            alert('שגיאה בהקצאת המשימה. אולי משויכת כבר.');
+        }
+    };
+
+    const addReward = async (data, editId) => {
+        if (editId) {
+            await api.updateReward(editId, data);
+        } else {
+            await api.addReward(data);
+        }
+    }
+
+    const deleteReward = async (id) => {
         if (confirm('האם אתה בטוח שברצונך למחוק פרס זה?')) {
             try {
                 await api.deleteReward(id);
@@ -133,27 +190,26 @@ function ParentDashboard() {
         }
     };
 
-    const handleApproveTransaction = async (id) => {
-        try {
-            await api.reviewTransaction(id, { approved: true });
-            setPendingTransactions(prev => prev.filter(t => t.id !== id));
-        } catch (error) {
-            console.error('Error approving transaction:', error);
+    const addPenalty = async (data) => {
+        await api.addTransaction(data);
+    };
+
+    const updateAssignmentPoints = async (id, points) => {
+        const newPoints = prompt('הזן את מספר הנקודות החדש עבור המשימה:', points);
+        if (newPoints && !isNaN(newPoints)) {
+            await api.updateAssignment(id, { points: parseInt(newPoints) });
         }
     };
 
-    const handleRejectTransaction = async (id) => {
-        try {
-            await api.reviewTransaction(id, { approved: false });
-            setPendingTransactions(prev => prev.filter(t => t.id !== id));
-        } catch (error) {
-            console.error('Error rejecting transaction:', error);
+    const deleteAssignment = async (id) => {
+        if (confirm('האם אתה בטוח שברצונך למחוק הקצאת משימה זו?')) {
+            await api.deleteAssignment(id);
         }
     };
 
-    if (loading) {
-        return <div className="loading">טוען...</div>;
-    }
+    const reviewTransaction = async (id, approved) => {
+        await api.reviewTransaction(id, approved);
+    };
 
     return (
         <div className="parent-dashboard">
@@ -283,7 +339,7 @@ function ParentDashboard() {
                                     </div>
                                     <button
                                         className="btn-danger"
-                                        onClick={() => handleDeleteTask(task.id)}
+                                        onClick={() => deleteTask(task.id)}
                                     >
                                         מחק
                                     </button>
@@ -338,7 +394,7 @@ function ParentDashboard() {
                                     </div>
                                     <button
                                         className="btn-danger"
-                                        onClick={() => handleDeleteReward(reward.id)}
+                                        onClick={() => deleteReward(reward.id)}
                                     >
                                         מחק
                                     </button>

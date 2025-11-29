@@ -6,13 +6,13 @@ function PenaltyModal({ isOpen, onClose, onSubmit, children }) {
   const [reason, setReason] = useState('');
   const [amount, setAmount] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (selectedChild && amount && reason.trim()) {
+    if (selectedChild && reason.trim() && amount > 0) {
       onSubmit({
         child_id: parseInt(selectedChild),
         action_type: 'penalty',
-        amount: -Math.abs(parseInt(amount)),
+        amount: -parseInt(amount),
         description: reason
       });
       setSelectedChild('');
