@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { api } from "../api";
-import { useSocket } from "../SocketContext";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { api } from '../api';
+import { useSocket } from '../SocketContext';
 import './ChildrenView.css';
 
 function ChildrenView() {
@@ -22,7 +22,7 @@ function ChildrenView() {
 
         return () => {
             socket.off('childAdded');
-        }
+        };
     }, [socket]);
 
     const loadChildren = async () => {
@@ -35,38 +35,28 @@ function ChildrenView() {
             <button className="back-button" onClick={() => navigate('/')}>← חזור הביתה</button>
 
             <h1>בחר ילד</h1>
-
             <div className="children-grid">
-                {children.length > 0 ? (
-                    children.map(child => (
-                        <div
-                            key={child.id}
-                            className="child-card"
-                            onClick={() => handleChildClick(child.id)}
-                        >
-                            <div className="child-avatar">
-                                {child.image ? (
-                                    <img src={child.image} alt={child.name} />
-                                ) : (
-                                    <span className="default-avatar">👤</span>
-                                )}
-                            </div>
-                            <div className="child-info">
-                                <h2>{child.name}</h2>
-                                <div className="child-balance">
-                                    <span className="balance-label">נקודות:</span>
-                                    <span className="balance-value">{child.balance}</span>
-                                </div>
-                            </div>
-                            <div className="child-arrow">→</div>
+                {children.map(child => (
+                    <div
+                        key={child.id}
+                        className="child-card"
+                        onClick={() => navigate(`/child/${child.id}`)}
+                    >
+                        <div className="child-avatar">
+                            {child.image ? (
+                                <img src={child.image} alt={child.name} />
+                            ) : (
+                                <span className="default-avatar">👤</span>
+                            )}
                         </div>
-                    ))
-                ) : (
-                    <div className="no-children">
-                        <p>אין ילדים זמינים</p>
+                        <h2>{child.name}</h2>
+                        <div className="child-balance">{child.balance} נקודות </div>
                     </div>
-                )}
+                ))}
             </div>
+            {children.length === 0 && (
+                <p className="no-children">אין ילדים במערכת. הורה צריך להוסיף ילדים תחילה.</p>
+            )}
         </div>
     );
 }
