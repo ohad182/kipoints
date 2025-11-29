@@ -126,9 +126,9 @@ function ParentDashboard() {
         for (const child of childrenData) {
             const assignments = await api.getAssignments(child.id);
             assignments.forEach(assignment => {
-                allAssignments.push({
+                allAssignmentsData.push({
                     ...assignment,
-                    childName: child.name
+                    child_name: child.name
                 });
             });
         }
@@ -141,13 +141,13 @@ function ParentDashboard() {
         } else {
             await api.addChild(data);
         }
-    }
+    };
 
     const deleteChild = async (id) => {
         if (confirm('האם אתה בטוח שברצונך למחוק ילד זה? כל הנתונים שלו יימחקו.')) {
             await api.deleteChild(id);
         }
-    }
+    };
 
     const addTask = async (data, editId) => {
         if (editId) {
@@ -155,7 +155,7 @@ function ParentDashboard() {
         } else {
             await api.addTask(data);
         }
-    }
+    };
 
     const deleteTask = async (id) => {
         if (confirm('האם אתה בטוח שברצונך למחוק משימה זו?')) {
@@ -178,7 +178,7 @@ function ParentDashboard() {
         } else {
             await api.addReward(data);
         }
-    }
+    };
 
     const deleteReward = async (id) => {
         if (confirm('האם אתה בטוח שברצונך למחוק פרס זה?')) {
@@ -215,223 +215,78 @@ function ParentDashboard() {
         <div className="parent-dashboard">
             <button className="back-button" onClick={() => navigate('/')}>← חזור הביתה</button>
 
-            <header className="dashboard-header">
-                <h1>ממשק הורים</h1>
-                <div className="header-stats">
-                    <div className="stat">
-                        <span className="stat-label">ילדים:</span>
-                        <span className="stat-value">{children.length}</span>
-                    </div>
-                    <div className="stat">
-                        <span className="stat-label">משימות:</span>
-                        <span className="stat-value">{tasks.length}</span>
-                    </div>
-                    <div className="stat">
-                        <span className="stat-label">פרסים:</span>
-                        <span className="stat-value">{rewards.length}</span>
-                    </div>
-                    <div className="stat">
-                        <span className="stat-label">בהמתנה:</span>
-                        <span className="stat-value pending">{pendingTransactions.length}</span>
-                    </div>
-                </div>
-            </header>
+            <h1>ממשק הורים</h1>
 
-            <nav className="tabs">
+            <div className="tabs">
                 <button
-                    className={`tab ${activeTab === 'overview' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('overview')}
+                    className={activeTab === 'review' ? 'active' : ''}
+                    onClick={() => setActiveTab('review')}
                 >
-                    סקירה כללית
+                    סקירה כללית               ({pendingTransactions.length})
                 </button>
                 <button
-                    className={`tab ${activeTab === 'tasks' ? 'active' : ''}`}
+                    className={activeTab === 'children' ? 'active' : ''}
+                    onClick={() => setActiveTab('children')}
+                >
+                    ילדים
+                </button>
+                <button
+                    className={activeTab === 'tasks' ? 'active' : ''}
                     onClick={() => setActiveTab('tasks')}
                 >
                     משימות
                 </button>
                 <button
-                    className={`tab ${activeTab === 'rewards' ? 'active' : ''}`}
+                    className={activeTab === 'assignments' ? 'active' : ''}
+                    onClick={() => setActiveTab('assignments')}
+                >
+                    שיוכים ({allAssignments.length})
+                </button>
+                <button
+                    className={activeTab === 'rewards' ? 'active' : ''}
                     onClick={() => setActiveTab('rewards')}
                 >
                     פרסים
                 </button>
                 <button
-                    className={`tab ${activeTab === 'transactions' ? 'active' : ''}`}
+                    className={activeTab === 'transactions' ? 'active' : ''}
                     onClick={() => setActiveTab('transactions')}
                 >
                     עסקאות בהמתנה
                 </button>
-            </nav>
+            </div>
 
             <div className="tab-content">
-                {/* Overview Tab */}
-                {activeTab === 'overview' && (
-                    <div className="overview-section">
-                        <div className="children-summary">
-                            <h2>ילדים</h2>
-                            <div className="children-list">
-                                {children.map(child => (
-                                    <div key={child.id} className="child-summary-card">
-                                        <div className="summary-avatar">
-                                            {child.image ? (
-                                                <img src={child.image} alt={child.name} />
-                                            ) : (
-                                                <span>👤</span>
-                                            )}
-                                        </div>
-                                        <div className="summary-info">
-                                            <h3>{child.name}</h3>
-                                            <p>נקודות: <strong>{child.balance}</strong></p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Tasks Tab */}
-                {activeTab === 'tasks' && (
-                    <div className="tasks-section">
-                        <form className="add-form" onSubmit={handleAddTask}>
-                            <h2>הוסף משימה חדשה</h2>
-                            <div className="form-group">
-                                <input
-                                    type="text"
-                                    placeholder="שם המשימה"
-                                    value={newTask.name}
-                                    onChange={(e) => setNewTask({ ...newTask, name: e.target.value })}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <select
-                                    value={newTask.category}
-                                    onChange={(e) => setNewTask({ ...newTask, category: e.target.value })}
-                                >
-                                    <option value="morning">בוקר</option>
-                                    <option value="afternoon">צהריים</option>
-                                    <option value="evening">ערב</option>
-                                    <option value="other">אחרים</option>
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <input
-                                    type="text"
-                                    placeholder="סמל/אמוג'י"
-                                    value={newTask.icon}
-                                    onChange={(e) => setNewTask({ ...newTask, icon: e.target.value })}
-                                    maxLength="2"
-                                />
-                            </div>
-                            <button type="submit" className="btn-primary">הוסף משימה</button>
-                        </form>
-
-                        <div className="items-list">
-                            <h2>משימות קיימות</h2>
-                            {tasks.map(task => (
-                                <div key={task.id} className="item-card">
-                                    <span className="item-icon">{task.icon}</span>
-                                    <div className="item-details">
-                                        <h3>{task.name}</h3>
-                                        <p>{task.category === 'morning' ? 'בוקר' : task.category === 'afternoon' ? 'צהריים' : task.category === 'evening' ? 'ערב' : 'אחרים'}</p>
-                                    </div>
-                                    <button
-                                        className="btn-danger"
-                                        onClick={() => deleteTask(task.id)}
-                                    >
-                                        מחק
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Rewards Tab */}
-                {activeTab === 'rewards' && (
-                    <div className="rewards-section">
-                        <form className="add-form" onSubmit={handleAddReward}>
-                            <h2>הוסף פרס חדש</h2>
-                            <div className="form-group">
-                                <input
-                                    type="text"
-                                    placeholder="שם הפרס"
-                                    value={newReward.name}
-                                    onChange={(e) => setNewReward({ ...newReward, name: e.target.value })}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <input
-                                    type="number"
-                                    placeholder="עלות בנקודות"
-                                    value={newReward.cost}
-                                    onChange={(e) => setNewReward({ ...newReward, cost: e.target.value })}
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <input
-                                    type="text"
-                                    placeholder="תמונה/אמוג'י"
-                                    value={newReward.image}
-                                    onChange={(e) => setNewReward({ ...newReward, image: e.target.value })}
-                                />
-                            </div>
-                            <button type="submit" className="btn-primary">הוסף פרס</button>
-                        </form>
-
-                        <div className="items-list">
-                            <h2>פרסים קיימים</h2>
-                            {rewards.map(reward => (
-                                <div key={reward.id} className="item-card">
-                                    <span className="item-icon">{reward.image || '🎁'}</span>
-                                    <div className="item-details">
-                                        <h3>{reward.name}</h3>
-                                        <p>{reward.cost} נקודות</p>
-                                    </div>
-                                    <button
-                                        className="btn-danger"
-                                        onClick={() => deleteReward(reward.id)}
-                                    >
-                                        מחק
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Transactions Tab */}
-                {activeTab === 'transactions' && (
-                    <div className="transactions-section">
-                        <h2>עסקאות בהמתנה לאישור</h2>
-                        {pendingTransactions.length > 0 ? (
-                            <div className="transactions-list">
+                {/* Overeview Tab */}
+                {activeTab === 'review' && (
+                    <div className="review-section">
+                        <h2>פעולות ממתינות לבדיקה</h2>
+                        {pendingTransactions.length === 0 ? (
+                            <p className="empty-message">אין פעולות ממתינות</p>
+                        ) : (
+                            <div className="pending-list">
                                 {pendingTransactions.map(transaction => (
-                                    <div key={transaction.id} className="transaction-card">
-                                        <div className="transaction-info">
-                                            <h3>{transaction.child_name}</h3>
-                                            <p className="description">{transaction.description}</p>
-                                            <p className="type">{transaction.action_type === 'task' ? 'משימה' : transaction.action_type === 'reward' ? 'פרס' : transaction.action_type === 'penalty' ? 'קנס' : 'בונוס'}</p>
-                                        </div>
-                                        <div className="transaction-amount">
+                                    <div key={transaction.id} className="pending-item">
+                                        <div className="pending-info">
+                                            <strong>{transaction.child_id}</strong>
+                                            <span>{transaction.description}</span>
                                             <span className={transaction.amount > 0 ? 'positive' : 'negative'}>
-                                                {transaction.amount > 0 ? '+' : ''}{transaction.amount}
+                                                {transaction.amount > 0 ? '+' : ''}{transaction.amount} נקודות
+                                            </span>
+                                            <span className="timestamp">
+                                                {new Date(transaction.timestamp).toLocaleString('he-IL')}
                                             </span>
                                         </div>
-                                        <div className="transaction-actions">
+                                        <div className="pending-actions">
                                             <button
-                                                className="btn-approve"
-                                                onClick={() => handleApproveTransaction(transaction.id)}
+                                                className="approve-button"
+                                                onClick={() => reviewTransaction(transaction.id, true)}
                                             >
                                                 אשר
                                             </button>
                                             <button
-                                                className="btn-reject"
-                                                onClick={() => handleRejectTransaction(transaction.id)}
+                                                className="rejeect-button"
+                                                onClick={() => reviewTransaction(transaction.id, false)}
                                             >
                                                 דחה
                                             </button>
@@ -439,14 +294,167 @@ function ParentDashboard() {
                                     </div>
                                 ))}
                             </div>
-                        ) : (
-                            <p className="no-transactions">אין עסקאות בהמתנה</p>
                         )}
                     </div>
                 )}
+
+                {/* Children Management Tab */}
+                {activeTab === 'children' && (
+                    <div className="management-section">
+                        <button className="add-button" onClick={() => { setEditChild(null); setShowAddChild(true); }}>הוסף ילד +</button>
+                        <button className="add-button penalty-button" onClick={() => setShowPenalty(true)}>הורד נקודות -</button>
+                        <div className="items-grid">
+                            {children.map(child => (
+                                <div key={child.id} className="item-card">
+                                    <div className="item-actions">
+                                        <button className="item-action-btn edit" onClick={() => {setEditChild(child); setShowAddChild(true); }}>✏️</button>
+                                        <button className="item-action-btn delete" onClick={() => deleteChild(child.id)}>🗑️</button>
+                                    </div>
+                                    <div className="item-icon">
+                                        {child.image ? (
+                                            <img src={child.image} alt={child.name} style={{ width: '100%', height: '60px', objectFit: 'cover', borderRadius: '10px' }} />
+                                        ) : (
+                                            '👤'
+                                        )}
+                                    </div>
+                                    <div className="item-name">{child.name}</div>
+                                    <div className="item-info">{child.balance}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Tasks Tab */}
+                {activeTab === 'tasks' && (
+                    <div className="management-section">
+                        <button className="add-button" onClick={() => { setEditTask(null); setShowAddTask(true); }}>הוסף משימה +</button>
+                        <button className="add-button" onClick={() => setShowAssignTask(true)}>שיוך משימה לילד</button>
+                        <div className="items-grid">
+                            <h2>משימות קיימות</h2>
+                            {tasks.map(task => (
+                                <div key={task.id} className="item-card">
+                                    <div className="items-actions">
+                                        <button className="item-action-btn edit" onClick={() => { setEditTask(task); setShowAddTask(true); }}>✏️</button>
+                                        <button className="item-action-btn delete" onClick={() => deleteTask(task.id) }>🗑️</button>
+                                    </div>
+                                    <div className="item-icon">{task.icon || 'i'}</div>
+                                    <div className="item-name">{task.name}</div>
+                                    <div className="item-info">
+                                        {task.category === 'morning' ? 'בוקר' : task.category === 'afternoon' ? 'צהריים' : task.category === 'evening' ? 'ערב' : 'אחרים'}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Assignments Tab */}
+                {activeTab === 'assignments' && (
+                    <div className="management-section">
+                        <button className="add-button" onClick={() => setShowAssignTask(true)}>שיוך משימה לילד</button>
+                        {allAssignments.length === 0 ? (
+                            <p className="empty-message">אין שיוכים עדייו</p>
+                        ) : (
+                            <div className="assignments-grid">
+                            {allAssignments.map(assignment => (
+                                <div key={assignment.id} className="assignment-item">
+                                    <div className="assignment-info">
+                                        <div className="assignment-icon">{assignment.icon || 'v'}</div>
+                                        <div className="assignment-details">
+                                            <strong>{assignment.child_name}</strong>
+                                            <span>{assignment.name}</span>
+                                            <span className="assignment-category">
+                                                {assignment.category === 'morning' && 'בוקר'}
+                                                {assignment.category === 'afternoon' && 'צהריים'}
+                                                {assignment.category === 'evening' && 'ערב'}
+                                                {assignment.category === 'other' && 'אחר'}
+                                            </span>
+                                        </div>
+                                        <div className="assignment-points">{assignment.points} נקודות </div>
+                                    </div>
+                                    <div className="assignment-actions">
+                                        <button
+                                          className="item-action-btn edit"
+                                          onClick={() => updateAssignmentPoints(assignment.id, assignment.points)}
+                                          title="ערוך נקודות"
+                                          >
+                                            ✏️
+                                        </button>
+                                        <button
+                                          className="item-action-btn delete"
+                                          onClick={() => deleteAssignment(assignment.id)}
+                                          title="מחק שיוך"
+                                          >
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        )}
+                    </div>
+                )}
+
+
+                {/* Rewards Tab */}
+                {activeTab === 'rewards' && (
+                    <div className="management-section">
+                        <button className="add-button" onClick={() => { setEditReward(null); setShowAddReward(true); }}>הוסף פרס +</button>
+                        <div className="items-grid">
+                            <h2>פרסים קיימים</h2>
+                            {rewards.map(reward => (
+                                <div key={reward.id} className="item-card">
+                                    <div className="items-actions">
+                                        <button className="item-action-btn edit" onClick={() => { setEditReward(reward); setShowAddReward(true); }}>✏️</button>
+                                        <button className="item-action-btn delete" onClick={() => deleteReward(reward.id) }>🗑️</button>
+                                    </div>
+                                    <div className="item-icon">{reward.image || 'i'}</div>
+                                    <div className="item-name">{reward.name}</div>
+                                    <div className="item-info">{reward.cost} נקודות </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Modals */}
+                <AddChildModal
+                    isOpen={showAddChild}
+                    onClose={() => { setShowAddChild(false); setEditChild(null); }}
+                    onSubmit={addChild}
+                    editData={editChild}
+                />
+                <AddTaskModal
+                    isOpen={showAddTask}
+                    onClose={() => { setShowAddTask(false); setEditTask(null); }}
+                    onSubmit={addTask}
+                    editData={editTask}
+                />
+                <AddRewardModal
+                    isOpen={showAddReward}
+                    onClose={() => { setShowAddReward(false); setEditReward(null); }}
+                    onSubmit={addReward}
+                    editData={editReward}
+                />
+                <AssignTaskModal
+                    isOpen={showAssignTask}
+                    onClose={() => setShowAssignTask(false)}
+                    onSubmit={assignTask}
+                    children={children}
+                    tasks={tasks}
+                />
+                <PenaltyModal
+                    isOpen={showPenalty}
+                    onClose={() => setShowPenalty(false)}
+                    onSubmit={addPenalty}
+                    children={children}
+                />
+
+
             </div>
         </div>
-    );
-}
+    )
+};
 
 export default ParentDashboard;
