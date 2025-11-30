@@ -76,7 +76,7 @@ function ChildDashboard() {
                 child_id: parseInt(id),
                 action_type: 'reward',
                 amount: -reward.cost,
-                description: reward.name
+                description: ` קנייה:${reward.name}`
             });
         }
     };
@@ -85,7 +85,7 @@ function ChildDashboard() {
 
     return (
         <div className="child-dashboard">
-            <button className="back-button" onClick={() => navigate('/child')}>← חזור</button>
+            <button className="back-button" onClick={() => navigate('/child')}>← חזרה</button>
 
             <div className="dashboard-header">
                 <h1>שלום {child.name}!</h1>
@@ -109,7 +109,7 @@ function ChildDashboard() {
                         <div className="tasks-grid">
                             {tasks[category].map(task => (
                                     <div key={task.id} className="task-card" onClick={() => completeTask(task)}>
-                                        <div className="task-icon">{task.icon}</div>
+                                        <div className="task-icon">{task.icon || '✔'}</div>
                                         <div className="task-name">{task.name}</div>
                                         <div className="task-points">+{task.points} נקודות</div>
                                     </div>

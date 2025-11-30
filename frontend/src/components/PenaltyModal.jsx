@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import './Modal.css';
 
 function PenaltyModal({ isOpen, onClose, onSubmit, children }) {
@@ -76,7 +76,7 @@ function PenaltyModal({ isOpen, onClose, onSubmit, children }) {
             <button type="button" className="modal-button secondary" onClick={onClose} >
               ביטול
             </button>
-            <button type="submit" className="modal-button primary" style={{ backgroundColor: '#e74c3c' }}>
+            <button type="submit" className="modal-button primary" disabled={!selectedChild || reason.trim()} style={{ backgroundColor: '#f44336' }}>
               הוסף קנס
             </button>
           </div>

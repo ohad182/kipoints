@@ -20,7 +20,7 @@ function AddRewardModal({ isOpen, onClose, onSubmit, editData }) {
 
     const iconsOptions = ['🎁', '🍕', '🍦', '🍪', '🎮', '🎬', '📚', '🏆', '🎫', '🎨', '🎵', '⚽', '🎪', '🌟', '💎', '🎯'];
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         if (name.trim() && cost > 0) {
             onSubmit({ name, cost: parseInt(cost), image }, editData?.id);

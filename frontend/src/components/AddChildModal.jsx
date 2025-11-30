@@ -23,14 +23,14 @@ function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setImage(reader.result)
+                setImage(reader.result);
                 setImagePreview(reader.result);
             };
             reader.readAsDataURL(file);
         }
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         if (name.trim()) {
             onSubmit({ name, image }, editData?.id);
@@ -60,6 +60,7 @@ function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
                             onChange={(e) => setName(e.target.value)}
                             placeholder="הזן את שם הילד"
                             required
+                            autoFocus
                         />
                     </div>
 
@@ -72,7 +73,7 @@ function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
                             style={{ display: 'none' }}
                             id="child-image-upload"
                         />
-                        <label htmlFor="child-image-upload" className='image-upload'>
+                        <label htmlFor="child-image-upload" className="image-upload">
                         {imagePreview ? (
                             <img src={imagePreview} alt="preview" className="image-preview" />
                         ) : (
@@ -88,7 +89,7 @@ function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
                         <button type="button" className="modal-button secondary" onClick={onClose}>
                             ביטול
                         </button>
-                        <button type="submit" className="modal-button primary">
+                        <button type="submit" className="modal-button primary" disabled={!name.trim()}>
                             {editData ? 'עדכן ילד' : 'הוסף ילד'}
                         </button>
                     </div>
