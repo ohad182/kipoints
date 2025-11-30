@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import './Modal.css';
 
 function AssignTaskModal({ isOpen, onClose, onSubmit, children, tasks }) {
@@ -6,14 +6,14 @@ function AssignTaskModal({ isOpen, onClose, onSubmit, children, tasks }) {
   const [selectedTask, setSelectedTask] = useState('');
   const [points, setPoints] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (selectedChild && selectedTask && points > 0) {
       onSubmit({ 
         child_id: parseInt(selectedChild), 
         task_id: parseInt(selectedTask), 
-        points: parseInt(points) }, 
-        editData?.id);
+        points: parseInt(points)
+      });
       setSelectedChild('');
       setSelectedTask('');
       setPoints('');
@@ -80,8 +80,8 @@ function AssignTaskModal({ isOpen, onClose, onSubmit, children, tasks }) {
             <button type="button" className="modal-button secondary" onClick={onClose}>
               ביטול
             </button>
-            <button type="submit" className="modal-button primary" >
-              {editData ? 'עדכן הקצאה' : 'הקצה משימה'}
+            <button type="submit" className="modal-button primary" disabled={!selectedChild || !selectedTask || !points} >
+              שייך
             </button>
           </div>
         </form>

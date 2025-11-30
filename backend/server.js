@@ -8,14 +8,14 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
-        origin: 'http://localhost:5173',
-        methods: ['GET', 'POST']
+        origin: "http://localhost:5173",
+        methods: ["GET", "POST"]
     }
 });
 
 const PORT = 3000;
 
-//Middleware
+// Middleware
 app.use(cors());
 app.use(express.json());
 
@@ -98,7 +98,7 @@ app.post('/api/assignments', (req, res) => {
             `).get(result.lastInsertRowid);
         io.emit('assignmentAdded', assignment);
         res.status(201).json(assignment);
-    } catch (err) {
+    } catch (error) {
         res.status(400).json({ error: 'Assignment already exists for this child and task.' });
     }
 });
@@ -183,7 +183,7 @@ app.post('/api/transactions', (req, res) => {
         db.prepare('UPDATE children SET balance = balance + ? WHERE id = ?').run(amount, child_id);
 
         // Get updated child
-        const updatedChild = db.prepare('SELECT * FROM children WHERE id = ?').get(child_id);
+        const child = db.prepare('SELECT * FROM children WHERE id = ?').get(child_id);
 
         // Get trannsaction with child name
         const newTransaction = db.prepare(`
@@ -214,7 +214,7 @@ app.patch('/api/transactions/:id/review', (req, res) => {
         } else {
             // Reverse the transaction
             db.prepare('UPDATE children SET balance = balance - ? WHERE id = ?').run(original.amount, original.child_id);
-            db.prepare('UPDATE transaction_log SET is_reviewed = 1 WHERE id = ?');
+            db.prepare('UPDATE transaction_log SET is_reviewed = 1 WHERE id = ?').run(transactionId);
 
             // Create a reversal transaction
             db.prepare('INSERT INTO transaction_log (child_id, action_type, amount, description, is_reviewed) VALUES (?, ?, ?, ?, 1)').run(

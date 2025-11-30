@@ -8,9 +8,9 @@ function ChildDashboard() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [child, setChild] = useState(null);
-    const [tasks, setTasks] = useState([{ morning: [], afternoon: [], evening: [], other: [] }]);
+    const [tasks, setTasks] = useState({ morning: [], afternoon: [], evening: [], other: [] });
     const [rewards, setRewards] = useState([]);
-    const socket = useSocket();
+    const { socket } = useSocket();
 
     useEffect(() => {
         loadData();
@@ -48,20 +48,20 @@ function ChildDashboard() {
         setRewards(rewardsData);
 
         const grouped = {
-            morning: [assignments.filter(a => a.category === 'morning')],
-            afternoon: [assignments.filter(a => a.category === 'afternoon')],
-            evening: [assignments.filter(a => a.category === 'evening')],
-            other: [assignments.filter(a => a.category === 'other')],
+            morning: assignments.filter(a => a.category === 'morning'),
+            afternoon: assignments.filter(a => a.category === 'afternoon'),
+            evening: assignments.filter(a => a.category === 'evening'),
+            other: assignments.filter(a => a.category === 'other')
         };
         setTasks(grouped);
     };
 
     const completeTask = async (task) => {
         await api.addTransaction({
-            childId: child.id,
-            actionType: 'task',
+            child_id: parseInt(id),
+            action_type: 'task',
             amount: task.points,
-            description: task.name,
+            description: task.name
         });
     };
 
@@ -73,10 +73,10 @@ function ChildDashboard() {
 
         if(confirm(`האם אתה בטוח שברצונך לרכוש את הפרס "${reward.name}" ב-${reward.cost} נקודות?`)) {
             await api.addTransaction({
-                childId: child.id,
-                actionType: 'reward',
+                child_id: parseInt(id),
+                action_type: 'reward',
                 amount: -reward.cost,
-                description: reward.name,
+                description: reward.name
             });
         }
     };
@@ -88,9 +88,9 @@ function ChildDashboard() {
             <button className="back-button" onClick={() => navigate('/child')}>← חזור</button>
 
             <div className="dashboard-header">
-                <h1>שלום ${child.name}</h1>
+                <h1>שלום {child.name}!</h1>
                 <div className="balance-display">
-                    <span className="balance-label">היתרה שלך:</span>"
+                    <span className="balance-label">היתרה שלך:</span>
                     <span className="balance-amount">{child.balance}</span>
                     <span className="balance-label">נקודות</span>
                 </div>
@@ -101,10 +101,10 @@ function ChildDashboard() {
                 {['morning', 'afternoon', 'evening', 'other'].map(category => (
                     <div key={category} className="task-category">
                         <h3>
-                            {category === 'morning' ? 'בוקר' :
-                             category === 'afternoon' ? 'צהריים' :
-                             category === 'evening' ? 'ערב' :
-                             'אחרים'}
+                            {category === 'morning' && 'בוקר' }
+                             {category === 'afternoon' && 'צהריים'}
+                             {category === 'evening' && 'ערב'}
+                             {category === 'other' && 'אחר'}
                         </h3>
                         <div className="tasks-grid">
                             {tasks[category].map(task => (
