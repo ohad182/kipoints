@@ -54,16 +54,16 @@ app.get('/api/tasks', (req, res) => {
 });
 
 app.post('/api/tasks', (req, res) => {
-    const { name, category, icon } = req.body;
-    const result = db.prepare('INSERT INTO task_catalog (name, category, icon) VALUES (?, ?, ?)').run(name, category, icon);
+    const { name, category, icon, completion_type = 'once' } = req.body;
+    const result = db.prepare('INSERT INTO task_catalog (name, category, icon, completion_type) VALUES (?, ?, ?, ?)').run(name, category, icon, completion_type);
     const task = db.prepare('SELECT * FROM task_catalog WHERE id = ?').get(result.lastInsertRowid);
     io.emit('taskAdded', task);
     res.status(201).json(task);
 });
 
 app.patch('/api/tasks/:id', (req, res) => {
-    const { name, category, icon } = req.body;
-    db.prepare('UPDATE task_catalog SET name = ?, category = ?, icon = ? WHERE id = ?').run(name, category, icon, req.params.id);
+    const { name, category, icon, completion_type } = req.body;
+    db.prepare('UPDATE task_catalog SET name = ?, category = ?, icon = ?, completion_type = ? WHERE id = ?').run(name, category, icon, completion_type, req.params.id);
     const task = db.prepare('SELECT * FROM task_catalog WHERE id = ?').get(req.params.id);
     io.emit('taskUpdated', task);
     res.json(task);
@@ -78,7 +78,7 @@ app.delete('/api/tasks/:id', (req, res) => {
 // ===== TASK ASSIGNMENTS ROUTES =====
 app.get('/api/assignments/:childId', (req, res) => {
     const assignments = db.prepare(`
-        SELECT ta.*, tc.name, tc.category, tc.icon
+        SELECT ta.*, tc.name, tc.category, tc.icon, tc.completion_type
         FROM task_assignments ta
         JOIN task_catalog tc ON ta.task_id = tc.id
         WHERE ta.child_id = ?
@@ -86,12 +86,33 @@ app.get('/api/assignments/:childId', (req, res) => {
     res.json(assignments);
 });
 
+// Get completed tasks for today
+app.get('/api/assignments/:childId/completed-today', (req, res) => {
+    const today =new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const completedToday = db.prepare(`
+        SELECT task_assignment_id, COUNT(*) as count
+        FROM transaction_log
+        WHERE child_id = ?
+        AND action_type = 'task'
+        AND DATE(timestamp) = ?
+        AND task_assignment_id IS NOT NULL
+        GROUP BY task_assignment_id
+        `).all(req.params.childId, today);
+    
+        const completedMap = {};
+        completedToday.forEach(row => {
+            completedMap[row.task_assignment_id] = row.count;
+        });
+
+    res.json(completedMap);
+});
+
 app.post('/api/assignments', (req, res) => {
     const { child_id, task_id, points } = req.body;
     try {
         const result = db.prepare('INSERT INTO task_assignments (child_id, task_id, points) VALUES (?, ?, ?)').run(child_id, task_id, points);
         const assignment = db.prepare(`
-        SELECT ta.*, tc.name, tc.category, tc.icon
+        SELECT ta.*, tc.name, tc.category, tc.icon, tc.completion_type
         FROM task_assignments ta
         JOIN task_catalog tc ON ta.task_id = tc.id
         WHERE ta.id = ?
@@ -107,7 +128,7 @@ app.patch('/api/assignments/:id', (req, res) => {
     const { points } = req.body;
     db.prepare('UPDATE task_assignments SET points = ? WHERE id = ?').run(points, req.params.id);
     const assignment = db.prepare(`
-        SELECT ta.*, tc.name, tc.category, tc.icon
+        SELECT ta.*, tc.name, tc.category, tc.icon, tc.completion_type
         FROM task_assignments ta
         JOIN task_catalog tc ON ta.task_id = tc.id
         WHERE ta.id = ?
@@ -173,11 +194,11 @@ app.get('/api/transactions/pending', (req, res) => {
 });
 
 app.post('/api/transactions', (req, res) => {
-    const { child_id, action_type, amount, description } = req.body;
+    const { child_id, action_type, amount, description, task_assignment_id } = req.body;
 
     const transaction = db.transaction(() => {
         // Insert into transaction_log
-        const result = db.prepare('INSERT INTO transaction_log (child_id, action_type, amount, description) VALUES (?, ?, ?, ?)').run(child_id, action_type, amount, description);
+        const result = db.prepare('INSERT INTO transaction_log (child_id, action_type, amount, description, task_assignment_id) VALUES (?, ?, ?, ?, ?)').run(child_id, action_type, amount, description, task_assignment_id || null);
 
         // Update child's balance
         db.prepare('UPDATE children SET balance = balance + ? WHERE id = ?').run(amount, child_id);

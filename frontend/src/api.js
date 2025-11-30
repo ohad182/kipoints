@@ -1,79 +1,83 @@
-const API_URL = 'http://localhost:3000/api';
+const getApiUrl = () => {
+    const savedUrl = localStorage.getItem('backendUrl') || 'http://localhost:3000';
+    return `${savedUrl}/api`;
+};
 
 export const api = {
     // Children API
-    getChildren: () => fetch(`${API_URL}/children`).then(res => res.json()),
-    addChild: (data) => fetch(`${API_URL}/children`, {
+    getChildren: () => fetch(`${getApiUrl()}/children`).then(res => res.json()),
+    addChild: (data) => fetch(`${getApiUrl()}/children`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     }).then(res => res.json()),
-    updateChild: (id, data) => fetch(`${API_URL}/children/${id}`, {
+    updateChild: (id, data) => fetch(`${getApiUrl()}/children/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     }).then(res => res.json()),
-    deleteChild: (id) => fetch(`${API_URL}/children/${id}`, {
+    deleteChild: (id) => fetch(`${getApiUrl()}/children/${id}`, {
         method: 'DELETE'
     }).then(res => res.json()),
 
     // Task Catalog API
-    getTasks: () => fetch(`${API_URL}/tasks`).then(res => res.json()),
-    addTask: (data) => fetch(`${API_URL}/tasks`, {
+    getTasks: () => fetch(`${getApiUrl()}/tasks`).then(res => res.json()),
+    addTask: (data) => fetch(`${getApiUrl()}/tasks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     }).then(res => res.json()),
-    updateTask: (id, data) => fetch(`${API_URL}/tasks/${id}`, {
+    updateTask: (id, data) => fetch(`${getApiUrl()}/tasks/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     }).then(res => res.json()),
-    deleteTask: (id) => fetch(`${API_URL}/tasks/${id}`, {
+    deleteTask: (id) => fetch(`${getApiUrl()}/tasks/${id}`, {
         method: 'DELETE'
     }).then(res => res.json()),
 
     // Assignments API
-    getAssignments: (childId) => fetch(`${API_URL}/assignments/${childId}`).then(res => res.json()),
-    addAssignment: (data) => fetch(`${API_URL}/assignments`, {
+    getAssignments: (childId) => fetch(`${getApiUrl()}/assignments/${childId}`).then(res => res.json()),
+    getCompletedToday: (childId) => fetch(`${getApiUrl()}/assignments/${childId}/completed-today`).then(res => res.json()),
+    addAssignment: (data) => fetch(`${getApiUrl()}/assignments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     }).then(res => res.json()),
-    updateAssignment: (id, data) => fetch(`${API_URL}/assignments/${id}`, {
+    updateAssignment: (id, data) => fetch(`${getApiUrl()}/assignments/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     }).then(res => res.json()),
-    deleteAssignment: (id) => fetch(`${API_URL}/assignments/${id}`, {
+    deleteAssignment: (id) => fetch(`${getApiUrl()}/assignments/${id}`, {
         method: 'DELETE'
     }).then(res => res.json()),
 
     // Rewards API
-    getRewards: () => fetch(`${API_URL}/rewards`).then(res => res.json()),
-    addReward: (data) => fetch(`${API_URL}/rewards`, {
+    getRewards: () => fetch(`${getApiUrl()}/rewards`).then(res => res.json()),
+    addReward: (data) => fetch(`${getApiUrl()}/rewards`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     }).then(res => res.json()),
-    updateReward: (id, data) => fetch(`${API_URL}/rewards/${id}`, {
+    updateReward: (id, data) => fetch(`${getApiUrl()}/rewards/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     }).then(res => res.json()),
-    deleteReward: (id) => fetch(`${API_URL}/rewards/${id}`, {
+    deleteReward: (id) => fetch(`${getApiUrl()}/rewards/${id}`, {
         method: 'DELETE'
     }).then(res => res.json()),
 
     // Transactions API
-    getTransactions: () => fetch(`${API_URL}/transactions`).then(res => res.json()),
-    getPendingTransactions: () => fetch(`${API_URL}/transactions/pending`).then(res => res.json()),
-    addTransaction: (data) => fetch(`${API_URL}/transactions`, {
+    getTransactions: () => fetch(`${getApiUrl()}/transactions`).then(res => res.json()),
+    getPendingTransactions: () => fetch(`${getApiUrl()}/transactions/pending`).then(res => res.json()),
+    addTransaction: (data) => fetch(`${getApiUrl()}/transactions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     }).then(res => res.json()),
-    reviewTransaction: (id, approved) => fetch(`${API_URL}/transactions/${id}/review`, {
+    reviewTransaction: (id, approved) => fetch(`${getApiUrl()}/transactions/${id}/review`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ approved })

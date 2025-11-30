@@ -10,7 +10,8 @@ export const SocketProvider = ({ children }) => {
   const [connected, setConnected] = useState(false);
 
     useEffect(() => {
-    const newSocket = io('http://localhost:3000');
+    const backendUrl = localStorage.getItem('backendUrl') || 'http://localhost:3000';
+    const newSocket = io(backendUrl);
 
     newSocket.on("connect", () => {
         console.log("Connected to WebSocket server");

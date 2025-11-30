@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import './Modal.css';
 
 function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
+    const { t } = useLanguage();
     const [name, setName] = useState('');
     const [image, setImage] = useState('');
     const [imagePreview, setImagePreview] = useState('');
@@ -47,25 +49,25 @@ function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2>{editData ? 'ערוך ילד' : 'הוסף ילד חדש'}</h2>
+                    <h2>{editData ? t('modal.editChild') : t('modal.addChild')}</h2>
                     <button className="modal-close" onClick={onClose}>×</button>
                 </div>
 
                 <form className="modal-form" onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label>שם הילד</label>
+                        <label>{t('modal.chidName')}</label>
                         <input
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            placeholder="הזן את שם הילד"
+                            placeholder={t('modal.chidName')}
                             required
                             autoFocus
                         />
                     </div>
 
                     <div className="form-group">
-                        <label>תמונה</label>
+                        <label>{t('modal.selectImage')}</label>
                         <input
                             type="file"
                             accept="image/*"
@@ -79,7 +81,7 @@ function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
                         ) : (
                             <div className="upload-placeholder">
                                 <span className="icon">📷</span>
-                                <p>לחץ להעלאת תמונה</p>
+                                <p>{t('modal.uploadImage')}</p>
                             </div>
                         )}
                         </label>
@@ -87,10 +89,10 @@ function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
 
                     <div className="modal-actions">
                         <button type="button" className="modal-button secondary" onClick={onClose}>
-                            ביטול
+                            {t('modal.cancel')}
                         </button>
                         <button type="submit" className="modal-button primary" disabled={!name.trim()}>
-                            {editData ? 'עדכן ילד' : 'הוסף ילד'}
+                            {editData ? t('modal.update') : t('modal.save')}
                         </button>
                     </div>
                 </form>

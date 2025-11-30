@@ -81,7 +81,7 @@
 .form-group select,
 .form-group textarea {
     padding: 0.75rem;
-    border: 1px solid #e0e0e0;
+    border: 2px solid #e0e0e0;
     border-radius: 10px;
     font-size: 1rem;
     transition: border-color 0.2s;
@@ -190,7 +190,7 @@
     padding: 0.75rem;
     font-size: 1.5rem;
     cursor: pointer;
-    transition: all;
+    transition: all 0.2s;
 }
 
 .icon-option:hover {
@@ -202,6 +202,34 @@
     background: #667eea;
     border-color: #667eea;
     transform: scale(1.1);
+}
+
+.selected-tasks-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 0.5rem;
+    background: #f9f9f9;
+}
+
+.selected-task-item {
+    padding: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.selected-task-item:last-child {
+    margin-bottom: 0;
+}
+
+.selected-task-item span {
+    font-size: 1rem;
+    color: #333;
 }
 
 @media (max-width: 768px) {

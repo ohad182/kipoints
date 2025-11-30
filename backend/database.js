@@ -22,6 +22,7 @@ db.exec(`
     name TEXT NOT NULL,
     category TEXT CHECK(category IN ('morning', 'afternoon', 'evening', 'other')),
     icon TEXT,
+    completion_type TEXT CHECK(completion_type IN ('once', 'multiple')) DEFAULT 'once',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -46,12 +47,14 @@ db.exec(`
     CREATE TABLE IF NOT EXISTS transaction_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     child_id INTEGER NOT NULL,
+    task_assignment_id INTEGER,
     action_type TEXT CHECK(action_type IN ('task', 'reward', 'penalty', 'bonus')),
     amount INTEGER NOT NULL,
     description TEXT NOT NULL,
     is_reviewed BOOLEAN DEFAULT 0,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
+    FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE,
+    FOREIGN KEY (task_assignment_id) REFERENCES task_assignments(id) ON DELETE SET NULL
   );
 
   CREATE INDEX IF NOT EXISTS idx_transactions_child ON transaction_log(child_id);
