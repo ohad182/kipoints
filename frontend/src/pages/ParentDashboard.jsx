@@ -2,8 +2,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import { useSocket } from '../SocketContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useNotification } from '../contexts/NotificationContext';
+import ConfirmDialog from '../components/ConfirmDialog';
+import PromptDialog from '../components/PromptDialog';
 import AddChildModal from '../components/AddChildModal';
 import AddTaskModal from '../components/AddTaskModal';
+import { ACTION_ICONS } from '../config/icons';
 import AddRewardModal from '../components/AddRewardModal';
 import AssignTaskModal from '../components/AssignTaskModal';
 import PenaltyModal from '../components/PenaltyModal';
@@ -11,12 +16,22 @@ import './ParentDashboard.css';
 
 function ParentDashboard() {
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('review');
+    const { t } = useLanguage();
+    const { showNotification } = useNotification();
+    const [activeTab, setActiveTab] = useState(() => {
+        return localStorage.getItem('parentDashboardTab') || 'review';
+    });
     const [children, setChildren] = useState([]);
     const [tasks, setTasks] = useState([]);
     const [rewards, setRewards] = useState([]);
     const [pendingTransactions, setPendingTransactions] = useState([]);
+    const [allTransactions, setAllTransactions] = useState([]);
     const [allAssignments, setAllAssignments] = useState([]);
+    const [assignmentFilter, setAssignmentFilter] = useState('all');
+    const [selectedTasks, setSelectedTasks] = useState([]);
+    const [preselectedAssignmentId, setPreselectedAssignmentId] = useState(null);
+    const [confirmDialog, setConfirmDialog] = useState(null);
+    const [promptDialog, setPromptDialog] = useState(null);
     const { socket } = useSocket();
 
     // Modal states
@@ -28,6 +43,11 @@ function ParentDashboard() {
     const [editChild, setEditChild] = useState(null);
     const [editTask, setEditTask] = useState(null);
     const [editReward, setEditReward] = useState(null);
+
+    // Save active tab to localStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem('parentDashboardTab', activeTab);
+    }, [activeTab]);
 
     useEffect(() => {
         loadData();
@@ -43,6 +63,11 @@ function ParentDashboard() {
 
         socket.on('transactionReviewed', () => {
             loadPendingTransactions();
+            loadChildren();
+        });
+
+        socket.on('transactionDeleted', () => {
+            loadAllTransactions();
             loadChildren();
         });
 
@@ -62,6 +87,7 @@ function ParentDashboard() {
 
         return () => {
             socket.off('transactionAdded');
+            socket.off('transactionDeleted');
             socket.off('transactionReviewed');
             socket.off('childAdded');
             socket.off('taskAdded');
@@ -79,7 +105,7 @@ function ParentDashboard() {
     }, [socket]);
 
     const loadData = async () => {
-        await Promise.all([loadChildren(), loadTasks(), loadRewards(), loadPendingTransactions(), loadAllAssignments()]);
+        await Promise.all([loadChildren(), loadTasks(), loadRewards(), loadPendingTransactions(), loadAllTransactions(), loadAllAssignments()]);
     };
 
     const loadChildren = async () => {
@@ -118,6 +144,11 @@ function ParentDashboard() {
         }
     };
 
+    const loadAllTransactions = async () => {
+        const data = await api.getTransactions();
+        setAllTransactions(data);
+    };
+
     const loadAllAssignments = async () => {
         // Get all assignments for all children
         const childrenData = await api.getChildren();
@@ -144,9 +175,15 @@ function ParentDashboard() {
     };
 
     const deleteChild = async (id) => {
-        if (confirm('האם אתה בטוח שברצונך למחוק ילד זה? כל הנתונים שלו יימחקו.')) {
-            await api.deleteChild(id);
-        }
+        setConfirmDialog( {
+            message: t('confirm.deleteChild'),
+            onConfirm: async () => {
+                await api.deleteChild(id);
+                setConfirmDialog(null);
+                showNotification(t('alerts.childDeleted'), 'success');
+            },
+            onCancel: () => setConfirmDialog(null)
+        });
     };
 
     const addTask = async (data, editId) => {
@@ -307,7 +344,7 @@ function ParentDashboard() {
                             {children.map(child => (
                                 <div key={child.id} className="item-card">
                                     <div className="item-actions">
-                                        <button className="item-action-btn edit" onClick={() => {setEditChild(child); setShowAddChild(true); }}>✏️</button>
+                                        <button className="item-action-btn edit" onClick={() => { setEditChild(child); setShowAddChild(true); }}>✏️</button>
                                         <button className="item-action-btn delete" onClick={() => deleteChild(child.id)}>🗑️</button>
                                     </div>
                                     <div className="item-icon">
@@ -336,7 +373,7 @@ function ParentDashboard() {
                                 <div key={task.id} className="item-card">
                                     <div className="items-actions">
                                         <button className="item-action-btn edit" onClick={() => { setEditTask(task); setShowAddTask(true); }}>✏️</button>
-                                        <button className="item-action-btn delete" onClick={() => deleteTask(task.id) }>🗑️</button>
+                                        <button className="item-action-btn delete" onClick={() => deleteTask(task.id)}>🗑️</button>
                                     </div>
                                     <div className="item-icon">{task.icon || 'i'}</div>
                                     <div className="item-name">{task.name}</div>
@@ -357,41 +394,41 @@ function ParentDashboard() {
                             <p className="empty-message">אין שיוכים עדייו</p>
                         ) : (
                             <div className="assignments-grid">
-                            {allAssignments.map(assignment => (
-                                <div key={assignment.id} className="assignment-item">
-                                    <div className="assignment-info">
-                                        <div className="assignment-icon">{assignment.icon || 'v'}</div>
-                                        <div className="assignment-details">
-                                            <strong>{assignment.child_name}</strong>
-                                            <span>{assignment.name}</span>
-                                            <span className="assignment-category">
-                                                {assignment.category === 'morning' && 'בוקר'}
-                                                {assignment.category === 'afternoon' && 'צהריים'}
-                                                {assignment.category === 'evening' && 'ערב'}
-                                                {assignment.category === 'other' && 'אחר'}
-                                            </span>
+                                {allAssignments.map(assignment => (
+                                    <div key={assignment.id} className="assignment-item">
+                                        <div className="assignment-info">
+                                            <div className="assignment-icon">{assignment.icon || 'v'}</div>
+                                            <div className="assignment-details">
+                                                <strong>{assignment.child_name}</strong>
+                                                <span>{assignment.name}</span>
+                                                <span className="assignment-category">
+                                                    {assignment.category === 'morning' && 'בוקר'}
+                                                    {assignment.category === 'afternoon' && 'צהריים'}
+                                                    {assignment.category === 'evening' && 'ערב'}
+                                                    {assignment.category === 'other' && 'אחר'}
+                                                </span>
+                                            </div>
+                                            <div className="assignment-points">{assignment.points} נקודות </div>
                                         </div>
-                                        <div className="assignment-points">{assignment.points} נקודות </div>
+                                        <div className="assignment-actions">
+                                            <button
+                                                className="item-action-btn edit"
+                                                onClick={() => updateAssignmentPoints(assignment.id, assignment.points)}
+                                                title="ערוך נקודות"
+                                            >
+                                                ✏️
+                                            </button>
+                                            <button
+                                                className="item-action-btn delete"
+                                                onClick={() => deleteAssignment(assignment.id)}
+                                                title="מחק שיוך"
+                                            >
+                                                🗑️
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div className="assignment-actions">
-                                        <button
-                                          className="item-action-btn edit"
-                                          onClick={() => updateAssignmentPoints(assignment.id, assignment.points)}
-                                          title="ערוך נקודות"
-                                          >
-                                            ✏️
-                                        </button>
-                                        <button
-                                          className="item-action-btn delete"
-                                          onClick={() => deleteAssignment(assignment.id)}
-                                          title="מחק שיוך"
-                                          >
-                                            🗑️
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
                         )}
                     </div>
                 )}
@@ -407,7 +444,7 @@ function ParentDashboard() {
                                 <div key={reward.id} className="item-card">
                                     <div className="items-actions">
                                         <button className="item-action-btn edit" onClick={() => { setEditReward(reward); setShowAddReward(true); }}>✏️</button>
-                                        <button className="item-action-btn delete" onClick={() => deleteReward(reward.id) }>🗑️</button>
+                                        <button className="item-action-btn delete" onClick={() => deleteReward(reward.id)}>🗑️</button>
                                     </div>
                                     <div className="item-icon">{reward.image || 'i'}</div>
                                     <div className="item-name">{reward.name}</div>

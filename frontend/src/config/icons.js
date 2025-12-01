@@ -1,0 +1,130 @@
+// Centralized icon configuration
+export const TASK_ICONS = {
+    brushTeeth: '🦷',
+    makeBed: '🛏️',
+    cleanRoom: '🧹',
+    homework: '📖',
+    dishes: '🍽️',
+    shower: '🚿',
+    trash: '🗑️',
+    walkDog: '🐕',
+    waterPlants: '🌱',
+    laundry: '🧺',
+    packBag: '🎒',
+    eatHealthy: '🍎',
+    exercise: '💪',
+    creative: '🎨',
+    reading: '📚',
+    instrument: '🎸',
+    meditation: '🧘',
+    screenLimit: '📱',
+    wakeUp: '⏰',
+    bikeRide: '🚴',
+    sports: '⚽',
+    writing: '✍️',
+    mathPractice: '➗',
+    learnLanguage: '🗣️',
+    goalCompletion: '🎯',
+    helpOthers: '🤝',
+    recycling: '♻️',
+    specialTask: '✨',
+    generalTask: '✔️',
+    study: '🧠'
+};
+
+export const REWARD_ICONS = {
+    gift: '🎁',
+    pizza: '🍕',
+    iceCream: '🍦',
+    videoGames: '🎮',
+    movie: '🎬',
+    funActivity: '🥳',
+    artSupplies: '🖍️',
+    screenTime: '📺',
+    privilege: '👑',
+    carRide: '🚗',
+    bowling: '🎳',
+    themePark: '🎢',
+    movieNight: '🍿',
+    dessert: '🍰',
+    toy: '🧸',
+    book: '📘',
+    musicHeadphones: '🎧',
+    sportsEquipment: '🏅',
+    instrument: '🎺',
+    artTime: '🖼️',
+    swimming: '🏊',
+    theater: '🎭',
+    circus: '🎪',
+    specialReward: '🌟',
+    premiumkeward: '💎',
+    achievement: '🏆',
+    party: '🎈',
+    fastFood: '🍟',
+    gameTime: '🕹️',
+    tvTime: '🛋️'
+};
+
+export const CATEGORY_ICONS = {
+    morning: '🌅',
+    afternoon: '☀️',
+    evening: '🌙',
+    other: '🗓️'
+};
+
+export const ACTION_ICONS = {
+    completed: '✅',
+    pending: '⏳',
+    bonus: '➕',
+    penalty: '➖',
+    reward: '⭐',
+    task: '📋',
+    success: '🎉',
+    error: '❌',
+    warning: '⚠️',
+    info: '💡',
+    camera: '📸'
+};
+
+export const CHILD_ICONS = {
+    boy: '👦',
+    girl: '👧',
+    baby: '👶',
+    owl: '🦉',
+    elephant: '🐘',
+    lion: '🦁',
+    tiger: '🐅',
+    fox: '🦊',
+    panda: '🐼',
+    koala: '🐨',
+    dog: '🐶',
+    cat: '🐱',
+    rabbit: '🐰',
+    hamster: '🐹',
+    bear: '🐻',
+    monkey: '🐒',
+    unicorn: '🦄',
+    dragon: '🐉',
+    dinosaur: '🦖',
+    robot: '🤖',
+    alien: '👽',
+    astronaut: '👩‍🚀',
+    superhero: '🦸',
+    princess: '👸',
+    prince: '🤴',
+    wizard: '🧙',
+    fairy: '🧚',
+    mermaid: '🧜',
+    ninja: '🐱‍👤',
+    pirate: '🏴‍☠️',
+    star: '⭐',
+    heart: '❤️',
+    rainbow: '🌈',
+    sun: '☀',
+    moon: '🌙'
+};
+
+// Helper to get icon arrays for selectors
+export const getTaskIconArray = () => Object.values(TASK_ICONS);
+export const getRewardIconArray = () => Object.values(REWARD_ICONS);
+export const getChildIconArray = () => Object.values(CHILD_ICONS);

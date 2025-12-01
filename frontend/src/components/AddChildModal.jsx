@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { getChildIconArray, ACTION_ICONS, CHILD_ICONS } from '../config/icons';
+import { useEscapeKey } from '../hooks/useEscapeKey';
 import './Modal.css';
 
 function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
@@ -7,16 +9,24 @@ function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
     const [name, setName] = useState('');
     const [image, setImage] = useState('');
     const [imagePreview, setImagePreview] = useState('');
+    const [selectedIcon, setSelectedIcon] = useState(CHILD_ICONS.boy);
+
+    useEscapeKey(isOpen, onClose);
 
     useEffect(() => {
         if (editData) {
             setName(editData.name || '');
             setImage(editData.image || '');
             setImagePreview(editData.image || '');
+            // If image starts with data: or http, it's an uploaded image, otherwise it's an icon
+            if (editData.image && !editData.image.startsWith('data:') && !editData.image.startsWith('http')) {
+                setSelectedIcon(editData.image);
+            }
         } else {
             setName('');
             setImage('');
             setImagePreview('');
+            setSelectedIcon(CHILD_ICONS.boy);
         }
     }, [editData, isOpen]);
 
@@ -27,18 +37,28 @@ function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
             reader.onloadend = () => {
                 setImage(reader.result);
                 setImagePreview(reader.result);
+                setSelectedIcon(''); // Clear icon selection when image is uploaded
             };
             reader.readAsDataURL(file);
         }
     };
 
+    const handleIconSelect = (icon) => {
+        setSelectedIcon(icon);
+        setImage(icon); // Set image to the emoji
+        setImagePreview(''); // Clear image preview
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         if (name.trim()) {
-            onSubmit({ name, image }, editData?.id);
+            // Use uploaded image if available, otherwise use selected icon
+            const finalImage = imagePreview || selectedIcon;
+            onSubmit({ name, image: finalImage }, editData?.id);
             setName('');
             setImage('');
             setImagePreview('');
+            setSelectedIcon(CHILD_ICONS.boy);
             onClose();
         }
     };
@@ -55,19 +75,35 @@ function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
 
                 <form className="modal-form" onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label>{t('modal.chidName')}</label>
+                        <label>{t('modal.childName')}</label>
                         <input
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            placeholder={t('modal.chidName')}
+                            placeholder={t('modal.childName')}
                             required
                             autoFocus
                         />
                     </div>
 
                     <div className="form-group">
-                        <label>{t('modal.selectImage')}</label>
+                        <label>{t('modal.icon')}</label>    
+                        <div className="icon-selector">
+                            {getChildIconArray().map(iconOption => (
+                                <button
+                                  key={iconOption}
+                                  type="button"
+                                  className={`icon-option ${selectedIcon === iconOption ? 'selected' : ''}`}
+                                  onClick={() => handleIconSelect(iconOption)}
+                                >
+                                    {iconOption}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label>{t('modal.orUploadImage')}</label>
                         <input
                             type="file"
                             accept="image/*"
@@ -80,7 +116,7 @@ function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
                             <img src={imagePreview} alt="preview" className="image-preview" />
                         ) : (
                             <div className="upload-placeholder">
-                                <span className="icon">📷</span>
+                                <span className="icon">{ACTION_ICONS.camera}</span>
                                 <p>{t('modal.uploadImage')}</p>
                             </div>
                         )}

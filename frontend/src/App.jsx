@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import { SocketProvider  } from './SocketContext';
+import { useEffect } from 'react';
+import { SocketProvider } from './SocketContext';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import { useLanguage } from './contexts/LanguageContext';
 import Toolbar from './components/Toolbar';
 import ChildrenView from './pages/ChildrenView';
@@ -8,24 +10,38 @@ import ChildDashboard from './pages/ChildDashboard';
 import ParentDashboard from './pages/ParentDashboard';
 import './App.css';
 
-function App() {
-  return (
-    <LanguageProvider>
-        <SocketProvider>
+function AppContent() {
+    const { t } = useLanguage();
+
+    useEffect(() => {
+        document.title = t('appTitle');
+    }, [t]);
+
+    return (
         <BrowserRouter>
-        <div className="app">
-            <Toolbar />
-            <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/child" element={<ChildrenView />} />
-                <Route path="/child/:id" element={<ChildDashboard />} />
-                <Route path="/parent" element={<ParentDashboard />} />
-            </Routes>
-        </div>
+            <div className="app">
+                <Toolbar />
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/child" element={<ChildrenView />} />
+                    <Route path="/child/:id" element={<ChildDashboard />} />
+                    <Route path="/parent" element={<ParentDashboard />} />
+                </Routes>
+            </div>
         </BrowserRouter>
-        </SocketProvider>
-    </LanguageProvider>
-  );
+    );
+}
+
+function App() {
+    return (
+        <LanguageProvider>
+            <NotificationProvider>
+                <SocketProvider>
+                    <AppContent />
+                </SocketProvider>
+            </NotificationProvider>
+        </LanguageProvider>
+    );
 }
 
 function Home() {

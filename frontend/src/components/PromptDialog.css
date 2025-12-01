@@ -1,0 +1,109 @@
+.prompt-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 1rem;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.prompt-dialog {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s ease-out;
+}
+
+.prompt-message {
+    color: #333;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+.prompt-input {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.prompt-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.prompt-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.prompt-button {
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 100px;
+}
+
+.prompt-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.prompt-button.cancel {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.prompt-button.cancel:hover:not(:disabled) {
+    background: #d0d0d0;
+}
+
+.prompt-button.confirm {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.prompt-button.confirm:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+@media (max-width: 768px) {
+    .prompt-dialog {
+        padding: 1.5rem;
+    }
+
+    .prompt-message {
+        font-size: 1rem;
+    }
+
+    .prompt-actions {
+        flex-direction: column-reverse;
+    }
+
+    .prompt-button {
+        width: 100%;
+    }
+}

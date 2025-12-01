@@ -82,4 +82,7 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ approved })
     }).then(res => res.json()),
+    deleteTransaction: (id) => fetch(`${getApiUrl()}/transactions/${id}`, {
+        method: 'DELETE'
+    }).then(res => res.json()),
 };

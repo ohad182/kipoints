@@ -1,10 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useEscapeKey } from '../hooks/useEscapeKey';
 import './Modal.css';
 
 function PenaltyModal({ isOpen, onClose, onSubmit, children }) {
+  const { t } = useLanguage();
   const [selectedChild, setSelectedChild] = useState('');
   const [reason, setReason] = useState('');
   const [amount, setAmount] = useState('');
+
+  useEscapeKey(isOpen, onClose);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -28,45 +33,45 @@ function PenaltyModal({ isOpen, onClose, onSubmit, children }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>⚠️ הוסף קנס</h2>
+          <h2>⚠️ {t('modal.addPenalty')}</h2>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
 
         <form className="modal-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>בחר ילד</label>
+            <label>{t('modal.selectChild')}</label>
             <select
               value={selectedChild}
               onChange={(e) => setSelectedChild(e.target.value)}
               required
             >
-              <option value="">-- בחר ילד --</option>
+              <option value="">-- {t('modal.selectChild')} --</option>
               {children.map(child => (
                 <option key={child.id} value={child.id}>
-                  {child.name} (נקודות: {child.balance})
+                  {child.name} ({t('child.points')}: {child.balance})
                 </option>
               ))}
             </select>
           </div>
 
           <div className="form-group">
-            <label>מספר נקודות להורדה</label>
+            <label>{t('modal.amount')}</label>
             <input
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              placeholder="הזן את מספר הנקודות"
+              placeholder={t('modal.amount')}
               min="1"
               required
             />
           </div>
 
           <div className="form-group">
-            <label>סיבת הקנס</label>
+            <label>{t('modal.reason')}</label>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="הזן את סיבת הקנס"
+              placeholder={t('modal.reason')}
               rows="3"
               required
             />
@@ -74,10 +79,10 @@ function PenaltyModal({ isOpen, onClose, onSubmit, children }) {
 
           <div className="modal-actions">
             <button type="button" className="modal-button secondary" onClick={onClose} >
-              ביטול
+              {t('modal.cancel')}
             </button>
             <button type="submit" className="modal-button primary" disabled={!selectedChild || reason.trim()} style={{ backgroundColor: '#f44336' }}>
-              הוסף קנס
+              {t('modal.addPenalty')}
             </button>
           </div>
         </form>

@@ -88,7 +88,7 @@ app.get('/api/assignments/:childId', (req, res) => {
 
 // Get completed tasks for today
 app.get('/api/assignments/:childId/completed-today', (req, res) => {
-    const today =new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     const completedToday = db.prepare(`
         SELECT task_assignment_id, COUNT(*) as count
         FROM transaction_log
@@ -98,11 +98,11 @@ app.get('/api/assignments/:childId/completed-today', (req, res) => {
         AND task_assignment_id IS NOT NULL
         GROUP BY task_assignment_id
         `).all(req.params.childId, today);
-    
-        const completedMap = {};
-        completedToday.forEach(row => {
-            completedMap[row.task_assignment_id] = row.count;
-        });
+
+    const completedMap = {};
+    completedToday.forEach(row => {
+        completedMap[row.task_assignment_id] = row.count;
+    });
 
     res.json(completedMap);
 });
@@ -253,6 +253,43 @@ app.patch('/api/transactions/:id/review', (req, res) => {
     const child = transaction();
     io.emit('transactionReviewed', { transactionId, approved, child });
     res.json({ success: true, message: 'Transaction reviewed successfully' });
+});
+
+app.delete('/api/transactions/:id', (req, res) => {
+    const transactionId = req.params.id;
+    const transaction = db.transaction(() => {
+
+        // Get transaction details before deleting
+        const trans = db.prepare('SELECT * FROM transaction_log WHERE id = ?').get(transactionId);
+
+        if (!trans) {
+            throw new Error('Transaction not found');
+        }
+
+        // Only allow deletion of reviewed transactions to prevent balance issues
+        if (!trans.is_reviewed) {
+            throw new Error('Can only delete reviewed transactions. Please approve or reject first.');
+        }
+
+        // Reverse the transaction amount from the child's balance
+        db.prepare('UPDATE children SET balance = balance - ? WHERE id = ?').run(trans.amount, trans.child_id);
+
+        // Delete the transaction
+        db.prepare('DELETE FROM transaction_log WHERE id = ?').run(transactionId);
+
+        // Get updated child data
+        const child = db.prepare('SELECT * FROM children WHERE id = ?').get(trans.child_id);
+
+        return {transactionId, child};
+    });
+
+    try {
+        const result = transaction();
+        io.emit('transactionDeleted', result);
+        res.json({ success: true, message: 'Transaction deleted successfully' });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
 });
 
 // WebSocket connection
