@@ -14,20 +14,24 @@
             "children": "ילדים",
             "tasks": "משימות",
             "assignments": "שיוכים",
-            "rewards": "פרסים"
+            "rewards": "פרסים",
+            "history": "היסטוריה"
         },
         "addChild": "הוסף ילד +",
         "addTask": "הוסף משימה +",
-        "assignTask": "שיוך משימה לילד",
+        "assignTask": "שיוך משימה לילד 🔗",
+        "assignSelectedTask": "שיוך משימה נבחרת 🔗",
         "assignSelected": "שיוך נבחרות",
         "clearSelection": "נקה בחירה",
         "addReward": "הוסף פרס +",
-        "addPenalty": "",
-        "emptyPending": "",
+        "addPenalty": "הוסף קנס",
+        "deleteTransaction": "מחק טרנזקציה",
+        "emptyPending": "אין משימות ממתינות לבדיקה",
         "emptyChildren": "אין ילדים עדיין",
         "emptyTasks": "אין משימות עדיין",
         "emptyAssignments": "אין שיוכים עדיין",
         "emptyRewards": "אין פרסים עדיין",
+        "emptyHistory": "אין היסטוריית טרנזקציות עדיין",
         "approve": "אישור ✔",
         "reject": "דחייה ✖",
         "points": "נקודות",
@@ -41,25 +45,38 @@
         "myTasks": "המשימות שלי",
         "rewards": "לרכישת פרסים",
         "back": "חזרה",
+        "loading": "טוען...",
+        "noChildren": "אין ילדים במערכת. הורה צריך להוסיף ילדים תחילה.",
         "notEnoughPoints": "אין מספיק נקודות לרכוש את הפרס הזה.",
+        "confirmPurchaseTitle": "רכישת פרס",
         "confirmPurchase": "האם אתה בטוח שברצונך לרכוש את הפרס \"{name}\" ב-{cost} נקודות?",
-        "purchasePrefix": "קנייה:"
+        "purchasePrefix": "קנייה:",
+        "done": "הושלם",
+        "alreadyCompleted": "המשימה כבר הושלמה היום",
+        "taskCompleted": "כל הכבוד! קיבלת +{points} נקודות!",
+        "rewardPurchased": "הפרס '{name}' נרכש בהצלחה!",
+        "noTasks": "אין משימות בקטגוריה זו",
+        "noRewards": "אין פרסים זמינים כרגע",
+        "need": "צריך עוד",
+        "more": "נקודות"
     },
     "categories": {
-        "morning": "בוקר 🌄",
-        "afternoon": "צהריים 🌅",
-        "evening": "ערב 🌙",
-        "other": "אחר 📌"
+        "morning": "בוקר",
+        "afternoon": "צהריים",
+        "evening": "ערב",
+        "other": "אחר"
     },
     "modal": {
         "addChild": "הוסף ילד חדש",
         "editChild": "ערוך ילד",
         "childName": "שם הילד",
         "selectImage": "בחר תמונה:",
+        "orUploadImage": "או העלה תמונה מותאמת אישית:",
         "uploadImage": "לחץ כדי להעלות תמונה",
         "cancel": "ביטול",
         "save": "שמור",
         "update": "עדכן",
+        "confirm": "אישור",
         "addTask": "הוסף משימה חדשה",
         "editTask": "ערוך משימה",
         "taskName": "שם המשימה",
@@ -71,8 +88,10 @@
         "completionMultiple": "מספר פעמים 🔁",
         "assignTask": "שיוך משימה לילד",
         "assignMultipleTasks": "שיוך מספר משימות לילד",
-        "selectedTas": "משימות נבחרות",
+        "selectedTasks": "משימות נבחרות",
         "selectChild": "בחר ילד",
+        "allChildren": "כל הילדים",
+        "alreadyAssigned": "כבר משויך",
         "selectTask": "בחר משימה",
         "assign": "שייך",
         "addReward": "הוסף פרס חדש",
@@ -93,5 +112,32 @@
         "backendHelp": "הזן את כתובת שרת ה-Backend (לדוגמא: http://192.168.100:3000)",
         "reset": "איפוס לברירת מחדל",
         "saved": "ההגדרות נשמרו! אנא רענן את הדף כדי שהשינויים ייכנסו לתוקף."
+    },
+    "confirm": {
+        "deleteChild": "האם אתה בטוח שברצונך למחור ילד זה? כל הנתונים שלו יימחקו.",
+        "deleteTask": "האם אתה בטוח שברצונך למחוק משימה זו?",
+        "deleteReward": "האם אתה בטוח שברצונך למחוק פרס זה?",
+        "deleteAssignment": "האם אתה בטוח שברצונך למחוק שיוך זה?",
+        "deleteTransaction": "האם אתה בטוח שברצונך למחוק טרנזקציה זו מההיסטוריה?"
+    },
+    "alerts": {
+        "taskAssigned": "המשימה שויכה בהצלחה!",
+        "taslAlreadyAssigned": "שגיאה: המשימה כבר משויכת לילד זה",
+        "multipleTasksAssigned": "{count} משימות שויכו בהצלחה",
+        "someTasksAlreadyAssigned": "שגיאה: חלק מהמשימות כבר משויכות לילד זה",
+        "childDeleted": "הילד נמחק בהצלחה",
+        "taskDeleted": "המשימה נמחקה בהצלחה",
+        "rewardDeleted": "הפרס נמחק בהצלחה",
+        "assignmentDeleted": "השיוך נמחק בהצלחה",
+        "pointsUpdated": "הנקודות עודכנו בהצלחה",
+        "trasactionDeleted": "הטרנזקציה נמחקה בהצלחה",
+        "transactionDeleteError": "לא ניתן למחוק טרנזקציות שלא נבדקו"
+    },
+    "prompts": {
+        "howManyPoints": "כמה נקודות?"
+    },
+    "buttons": {
+        "updatePoints": "עדכן נקודות",
+        "deleteAssignment": "מחק שיוך"
     }
 }

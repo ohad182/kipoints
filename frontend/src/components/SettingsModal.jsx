@@ -5,7 +5,7 @@ import './Modal.css';
 
 function SettingsModal({ isOpen, onClose }) {
     const { t } = useLanguage();
-    const [backendUrl, setBackendUrl] = usestate('');
+    const [backendUrl, setBackendUrl] = useState('');
 
     useEscapeKey(isOpen, onClose);
 
@@ -25,7 +25,7 @@ function SettingsModal({ isOpen, onClose }) {
         setBackendUrl('http://localhost:3000');
     };
 
-    if (!isopen) return null;
+    if (!isOpen)  return null;
 
     return (
         <div className="modal-overlay" onClick={onClose}>

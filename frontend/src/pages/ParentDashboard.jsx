@@ -63,6 +63,7 @@ function ParentDashboard() {
 
         socket.on('transactionReviewed', () => {
             loadPendingTransactions();
+            loadAllTransactions();
             loadChildren();
         });
 
@@ -84,11 +85,10 @@ function ParentDashboard() {
         socket.on('assignmentUpdated', () => loadAllAssignments());
         socket.on('assignmentDeleted', () => loadAllAssignments());
 
-
         return () => {
             socket.off('transactionAdded');
-            socket.off('transactionDeleted');
             socket.off('transactionReviewed');
+            socket.off('transactionDeleted');
             socket.off('childAdded');
             socket.off('taskAdded');
             socket.off('childUpdated');
@@ -175,7 +175,7 @@ function ParentDashboard() {
     };
 
     const deleteChild = async (id) => {
-        setConfirmDialog( {
+        setConfirmDialog({
             message: t('confirm.deleteChild'),
             onConfirm: async () => {
                 await api.deleteChild(id);
@@ -195,19 +195,83 @@ function ParentDashboard() {
     };
 
     const deleteTask = async (id) => {
-        if (confirm('האם אתה בטוח שברצונך למחוק משימה זו?')) {
-            await api.deleteTask(id);
-        }
+        setconfirmDialog({
+            message: t('confirm.deleteTask'),
+            onConfirm: async () => {
+                await api.deleteTask(id);
+                setconfirmDialog(null);
+                showNotification(t('alerts.taskDeleted'), 'success');
+            },
+            onCancel: () => setconfirmDialog(null)
+        });
     };
 
     const assignTask = async (data) => {
         try {
-            await api.addAssignment(data);
-            alert('המשימה הוקצתה בהצלחה!');
+            if (data.child_id === 'all') {
+                // Assign to all children
+                for (const child of children) {
+                    await api.addAssignment({
+                        child_id: child.id,
+                        task_id: data.task_id,
+                        points: data.points
+                    });
+                }
+                showNotification(t('alerts.multipleTasksAssigned', { count: children.length }), 'success');
+            } else {
+                await api.addAssignment({
+                    child_id: parseInt(data.child_id),
+                    task_id: data.task_id,
+                    points: data.points
+                });
+                showNotification(t('alerts.taskAssigned'), 'success');
+            }
         } catch (error) {
-            alert('שגיאה בהקצאת המשימה. אולי משויכת כבר.');
+            showNotification(t('alerts.taskAlreadyAssigned'), 'error');
         }
     };
+
+    const toggleTaskSelection = (taskId) => {
+        setSelectedTasks(prev =>
+            prev.includes(taskId)
+                ? prev.filter(id => id !== taskId)
+                : [...prev, taskId]
+        );
+    };
+
+    const assignMultipleTasks = async (childId, points) => {
+        try {
+            if (childId === 'all') {
+                // Assign all selected tasks to all children
+                let total = 0;
+                for (const child of children) {
+                    for (const taskId of selectedTasks) {
+                        await api.addAssignment({
+                            child_id: child.id,
+                            task_id: parseInt(taskId),
+                            points: parseInt(points)
+                        });
+                        total++;
+                    }
+                }
+                showNotification(t('alerts.multipleTasksAssigned', { count: total }), 'success');
+            } else {
+                for (const taskId of selectedTasks) {
+                    await api.addAssignment({
+                        child_id: parseInt(childId),
+                        task_id: parseInt(taskId),
+                        points: parseInt(points)
+                    });
+                }
+                showNotification(t('alerts.multipleTasksAssigned', { count: selectedTasks.length }), 'success');
+            }
+            setSelectedTasks([]);
+            setShowAssignTask(false);
+        } catch (error) {
+            showNotification(t('alerts.someTasksAlreadyAssigned'), 'error');
+        }
+    };
+
 
     const addReward = async (data, editId) => {
         if (editId) {
@@ -218,13 +282,33 @@ function ParentDashboard() {
     };
 
     const deleteReward = async (id) => {
-        if (confirm('האם אתה בטוח שברצונך למחוק פרס זה?')) {
-            try {
+        setconfirmDialog({
+            message: t('confirm.deleteReward'),
+            onConfirm: async () => {
                 await api.deleteReward(id);
-            } catch (error) {
-                console.error('Error deleting reward:', error);
-            }
-        }
+                setConfirmDialog(null);
+                showNotification(t('alerts.rewardDeleted'), 'success');
+            },
+            onCancel: () => setConfirmDialog(null)
+        });
+    };
+
+    const deleteTransaction = async (id) => {
+        setConfirmDialog({
+            message: t('confirm.deleteTransaction'),
+            onConfirm: async () => {
+                try {
+                    await api.deleteTransaction(id);
+                    await loadAllTransactions();
+                    setConfirmDialog(null);
+                    showNotification(t('alerts.transactionDeleted'), 'success');
+                } catch (error) {
+                    showNotification(error.message || t('alerts.transactionDeleteError'), 'error');
+                    setConfirmDialog(null);
+                }
+            },
+            onCancel: () => setConfirmDialog(null)
+        });
     };
 
     const addPenalty = async (data) => {
@@ -232,16 +316,30 @@ function ParentDashboard() {
     };
 
     const updateAssignmentPoints = async (id, points) => {
-        const newPoints = prompt('הזן את מספר הנקודות החדש עבור המשימה:', points);
-        if (newPoints && !isNaN(newPoints)) {
-            await api.updateAssignment(id, { points: parseInt(newPoints) });
-        }
+        setPromptDialog({
+            message: t('prompts.howManyPoints'),
+            defaultValue: points.toString(),
+            onConfirm: async (newPoints) => {
+                if (newPoints && !isNaN(newPoints)) {
+                    await api.updateAssignment(id, { points: parseInt(newPoints) });
+                    showNotification(t('alerts.pointsUpdated'), 'success');
+                }
+                setPromptDialog(null);
+            },
+            onCancel: () => setPromptDialog(null)
+        });
     };
 
     const deleteAssignment = async (id) => {
-        if (confirm('האם אתה בטוח שברצונך למחוק הקצאת משימה זו?')) {
-            await api.deleteAssignment(id);
-        }
+        setConfirmDialog({
+            message: t('confirm.deleteAssignment'),
+            onConfirm: async () => {
+                await api.deleteAssignment(id);
+                setConfirmDialog(null);
+                showNotification(t('alerts.assignmentDeleted'), 'success');
+            },
+            onCancel: () => setConfirmDialog(null)
+        });
     };
 
     const reviewTransaction = async (id, approved) => {
@@ -250,65 +348,65 @@ function ParentDashboard() {
 
     return (
         <div className="parent-dashboard">
-            <button className="back-button" onClick={() => navigate('/')}>← חזור הביתה</button>
+            <button className="back-button" onClick={() => navigate('/')}>{t('child.back')}</button>
 
-            <h1>ממשק הורים</h1>
+            <h1>{t('parent.dashboard')}</h1>
 
             <div className="tabs">
                 <button
                     className={activeTab === 'review' ? 'active' : ''}
                     onClick={() => setActiveTab('review')}
                 >
-                    סקירה כללית               ({pendingTransactions.length})
+                    {t('parent.tabs.review')} ({pendingTransactions.length})
                 </button>
                 <button
                     className={activeTab === 'children' ? 'active' : ''}
                     onClick={() => setActiveTab('children')}
                 >
-                    ילדים
+                    {t('parent.tabs.children')}
                 </button>
                 <button
                     className={activeTab === 'tasks' ? 'active' : ''}
                     onClick={() => setActiveTab('tasks')}
                 >
-                    משימות
+                    {t('parent.tabs.tasks')}
                 </button>
                 <button
                     className={activeTab === 'assignments' ? 'active' : ''}
                     onClick={() => setActiveTab('assignments')}
                 >
-                    שיוכים ({allAssignments.length})
+                    {t('parent.tabs.assignments')} ({allAssignments.length})
                 </button>
                 <button
                     className={activeTab === 'rewards' ? 'active' : ''}
                     onClick={() => setActiveTab('rewards')}
                 >
-                    פרסים
+                    {t('parent.tabs.rewards')}
                 </button>
                 <button
-                    className={activeTab === 'transactions' ? 'active' : ''}
-                    onClick={() => setActiveTab('transactions')}
+                    className={activeTab === 'history' ? 'active' : ''}
+                    onClick={() => setActiveTab('history')}
                 >
-                    עסקאות בהמתנה
+                    {t('parent.tabs.history')}
                 </button>
             </div>
 
-            <div className="tab-content">
+            <div className="tab-content" key={activeTab}>
                 {/* Overeview Tab */}
                 {activeTab === 'review' && (
                     <div className="review-section">
-                        <h2>פעולות ממתינות לבדיקה</h2>
+                        <h2>{t('parent.tabs.review')}</h2>
                         {pendingTransactions.length === 0 ? (
-                            <p className="empty-message">אין פעולות ממתינות</p>
+                            <p className="empty-message">{t('parent.emptyPending')}</p>
                         ) : (
                             <div className="pending-list">
                                 {pendingTransactions.map(transaction => (
                                     <div key={transaction.id} className="pending-item">
                                         <div className="pending-info">
-                                            <strong>{transaction.child_id}</strong>
+                                            <strong>{transaction.child_name}</strong>
                                             <span>{transaction.description}</span>
                                             <span className={transaction.amount > 0 ? 'positive' : 'negative'}>
-                                                {transaction.amount > 0 ? '+' : ''}{transaction.amount} נקודות
+                                                {transaction.amount > 0 ? '+' : ''}{transaction.amount}  {t('parent.points')}
                                             </span>
                                             <span className="timestamp">
                                                 {new Date(transaction.timestamp).toLocaleString('he-IL')}
@@ -319,13 +417,13 @@ function ParentDashboard() {
                                                 className="approve-button"
                                                 onClick={() => reviewTransaction(transaction.id, true)}
                                             >
-                                                אשר
+                                                {t('parent.approve')}
                                             </button>
                                             <button
-                                                className="rejeect-button"
+                                                className="reject-button"
                                                 onClick={() => reviewTransaction(transaction.id, false)}
                                             >
-                                                דחה
+                                                {t('parent.reject')}
                                             </button>
                                         </div>
                                     </div>
@@ -338,24 +436,28 @@ function ParentDashboard() {
                 {/* Children Management Tab */}
                 {activeTab === 'children' && (
                     <div className="management-section">
-                        <button className="add-button" onClick={() => { setEditChild(null); setShowAddChild(true); }}>הוסף ילד +</button>
-                        <button className="add-button penalty-button" onClick={() => setShowPenalty(true)}>הורד נקודות -</button>
+                        <button className="add-button" onClick={() => { setEditChild(null); setShowAddChild(true); }}>{t('parent.addChild')}</button>
+                        <button className="add-button penalty-button" onClick={() => setShowPenalty(true)}>{t('parent.addPenalty')}</button>
                         <div className="items-grid">
                             {children.map(child => (
                                 <div key={child.id} className="item-card">
                                     <div className="item-actions">
-                                        <button className="item-action-btn edit" onClick={() => { setEditChild(child); setShowAddChild(true); }}>✏️</button>
-                                        <button className="item-action-btn delete" onClick={() => deleteChild(child.id)}>🗑️</button>
+                                        <button className="item-action-btn edit" onClick={() => { setEditChild(child); setShowAddChild(true); }}>{ACTION_ICONS.edit}</button>
+                                        <button className="item-action-btn delete" onClick={() => deleteChild(child.id)}>{ACTION_ICONS.delete}</button>
                                     </div>
                                     <div className="item-icon">
                                         {child.image ? (
-                                            <img src={child.image} alt={child.name} style={{ width: '100%', height: '60px', objectFit: 'cover', borderRadius: '10px' }} />
+                                            child.image.startsWith('data:') || child.image.startsWith('http') ? (
+                                                <img src={child.image} alt={child.name} style={{ width: '100%', height: '60px', objectFit: 'cover', borderRadius: '10px' }} />
+                                            ) : (
+                                                <span style={{ fontSize: '3rem' }}>{child.image}</span>
+                                            )
                                         ) : (
-                                            '👤'
+                                            ACTION_ICONS.info
                                         )}
                                     </div>
                                     <div className="item-name">{child.name}</div>
-                                    <div className="item-info">{child.balance}</div>
+                                    <div className="item-info">{child.balance} {t('parent.points')}</div>
                                 </div>
                             ))}
                         </div>
@@ -365,20 +467,50 @@ function ParentDashboard() {
                 {/* Tasks Tab */}
                 {activeTab === 'tasks' && (
                     <div className="management-section">
-                        <button className="add-button" onClick={() => { setEditTask(null); setShowAddTask(true); }}>הוסף משימה +</button>
-                        <button className="add-button" onClick={() => setShowAssignTask(true)}>שיוך משימה לילד</button>
+                        <div className="tasks-header">
+                            <button className="add-button" onClick={() => { setEditTask(null); setShowAddTask(true); }}>{t('parent.addTask')}</button>
+                            <button className="add-button" onClick={() => setShowAssignTask(true)}>{t('parent.assignTask')}</button>
+                            {selectedTasks.length > 0 && (
+                                <>
+                                    <button className="add-button assign-selected-button" onClick={() => setShowAssignTask(true)}>
+                                        {t('parent.assignSelected')} ({selectedTasks.length})
+                                    </button>
+                                    <button className="add-button clear-selection-button" onClick={() => setSelectedTasks([])}>
+                                        {t('parent.clearSelection')}
+                                    </button>
+                                </>
+                            )}
+                        </div>
                         <div className="items-grid">
-                            <h2>משימות קיימות</h2>
                             {tasks.map(task => (
-                                <div key={task.id} className="item-card">
-                                    <div className="items-actions">
-                                        <button className="item-action-btn edit" onClick={() => { setEditTask(task); setShowAddTask(true); }}>✏️</button>
-                                        <button className="item-action-btn delete" onClick={() => deleteTask(task.id)}>🗑️</button>
+                                <div
+                                    key={task.id}
+                                    className={`item-card ${selectedTasks.includes(task.id) ? 'selected' : ''}`}
+                                    onClick={() => toggleTaskSelection(task.id)}
+                                >
+                                    <div className="item-actions">
+                                        <button
+                                            className="item-action-btn edit"
+                                            onClick={(e) => { e.stopPropagation(); setEditTask(task); setShowAddTask(true); }}
+                                        >
+                                            {ACTION_ICONS.edit}
+                                        </button>
+                                        <button
+                                            className="item-action-btn delete"
+                                            onClick={(e) => { e.stopPropagation(); deleteTask(task.id); }}
+                                        >
+                                            {ACTION_ICONS.delete}
+                                        </button>
                                     </div>
-                                    <div className="item-icon">{task.icon || 'i'}</div>
+                                    {selectedTasks.includes(task.id) && (
+                                        <div className="selection-checkbox">{ACTION_ICONS.task}</div>
+                                    )}
+                                    <div className="item-icon">{task.icon || ACTION_ICONS.task}</div>
                                     <div className="item-name">{task.name}</div>
                                     <div className="item-info">
-                                        {task.category === 'morning' ? 'בוקר' : task.category === 'afternoon' ? 'צהריים' : task.category === 'evening' ? 'ערב' : 'אחרים'}
+                                        {t(`categories.${task.category}`)}
+                                        {' • '}
+                                        {t(`completionType.${task.completion_type}`)}
                                     </div>
                                 </div>
                             ))}
@@ -389,109 +521,192 @@ function ParentDashboard() {
                 {/* Assignments Tab */}
                 {activeTab === 'assignments' && (
                     <div className="management-section">
-                        <button className="add-button" onClick={() => setShowAssignTask(true)}>שיוך משימה לילד</button>
-                        {allAssignments.length === 0 ? (
-                            <p className="empty-message">אין שיוכים עדייו</p>
-                        ) : (
-                            <div className="assignments-grid">
-                                {allAssignments.map(assignment => (
-                                    <div key={assignment.id} className="assignment-item">
-                                        <div className="assignment-info">
-                                            <div className="assignment-icon">{assignment.icon || 'v'}</div>
-                                            <div className="assignment-details">
-                                                <strong>{assignment.child_name}</strong>
-                                                <span>{assignment.name}</span>
-                                                <span className="assignment-category">
-                                                    {assignment.category === 'morning' && 'בוקר'}
-                                                    {assignment.category === 'afternoon' && 'צהריים'}
-                                                    {assignment.category === 'evening' && 'ערב'}
-                                                    {assignment.category === 'other' && 'אחר'}
-                                                </span>
-                                            </div>
-                                            <div className="assignment-points">{assignment.points} נקודות </div>
-                                        </div>
-                                        <div className="assignment-actions">
-                                            <button
-                                                className="item-action-btn edit"
-                                                onClick={() => updateAssignmentPoints(assignment.id, assignment.points)}
-                                                title="ערוך נקודות"
-                                            >
-                                                ✏️
-                                            </button>
-                                            <button
-                                                className="item-action-btn delete"
-                                                onClick={() => deleteAssignment(assignment.id)}
-                                                title="מחק שיוך"
-                                            >
-                                                🗑️
-                                            </button>
-                                        </div>
-                                    </div>
+                        <div className="assignments-header">
+                            <button
+                                className="add-button"
+                                onClick={() => setShowAssignTask(true)}
+                            >
+                                {t('parent.assignTask')}
+                            </button>
+                            <select
+                                className="assignment-filter"
+                                value={assignmentFilter}
+                                onChange={(e) => setAssignmentFilter(e.target.value)}
+                            >
+                                <option value="all">{t('parent.filterAll')}</option>
+                                {children.map(child => (
+                                    <option key={child.id} value={child.id}>{child.name}</option>
                                 ))}
+                            </select>
+                        </div>
+                        {allAssignments.length === 0 ? (
+                            <p className="empty-message">{t('parent.emptyAssignments')}</p>
+                        ) : (
+                            <div className="assignments-list">
+                                {allAssignments
+                                    .filter(assignment => assignmentFilter === 'all' || assignment.child_id === parseInt(assignmentFilter))
+                                    .map(assignment => (
+                                        <div
+                                            key={assignment.id}
+                                            className={`assignment-item ${preselectedAssignmentId === assignment.id ? 'selected' : ''}`}
+                                            onClick={(e) => {
+                                                // Prevent click if clicking on action buttons
+                                                if (!e.target.closest('.item-action-btn')) {
+                                                    // Toggle selection - if clicking the same assignment, deselect it
+                                                    setPreselectedAssignmentId(prev => prev === assignment.id ? null : assignment.id);
+                                                }
+                                            }}
+                                            style={{ cursor: 'pointer' }}
+                                        >
+                                            <div className="assignment-info">
+                                                <div className="assignment-icon">{assignment.icon || ACTION_ICONS.task}</div>
+                                                <div className="assignment-details">
+                                                    <strong>{assignment.child_name}</strong>
+                                                    <span>{assignment.name}</span>
+                                                    <span className="assignment-category">
+                                                        {t(`categories.${assignment.category}`)}
+                                                    </span>
+                                                </div>
+                                                <div className="assignment-points">{assignment.points} {t('parent.points')} </div>
+                                            </div>
+                                            <div className="assignment-actions">
+                                                <button
+                                                    className="item-action-btn edit"
+                                                    onClick={() => updateAssignmentPoints(assignment.id, assignment.points)}
+                                                    title={t('buttons.updatePoints')}
+                                                >
+                                                    {ACTION_ICONS.edit}
+                                                </button>
+                                                <button
+                                                    className="item-action-btn delete"
+                                                    onClick={() => deleteAssignment(assignment.id)}
+                                                    title={t('buttons.deleteAssignment')}
+                                                >
+                                                    {ACTION_ICONS.delete}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
                             </div>
                         )}
                     </div>
                 )}
 
-
                 {/* Rewards Tab */}
                 {activeTab === 'rewards' && (
                     <div className="management-section">
-                        <button className="add-button" onClick={() => { setEditReward(null); setShowAddReward(true); }}>הוסף פרס +</button>
+                        <button className="add-button" onClick={() => { setEditReward(null); setShowAddReward(true); }}>{t('parent.addReward')}</button>
                         <div className="items-grid">
-                            <h2>פרסים קיימים</h2>
                             {rewards.map(reward => (
                                 <div key={reward.id} className="item-card">
-                                    <div className="items-actions">
-                                        <button className="item-action-btn edit" onClick={() => { setEditReward(reward); setShowAddReward(true); }}>✏️</button>
-                                        <button className="item-action-btn delete" onClick={() => deleteReward(reward.id)}>🗑️</button>
+                                    <div className="item-actions">
+                                        <button className="item-action-btn edit" onClick={() => { setEditReward(reward); setShowAddReward(true); }}>{ACTION_ICONS.edit}</button>
+                                        <button className="item-action-btn delete" onClick={() => deleteReward(reward.id)}>{ACTION_ICONS.delete}</button>
                                     </div>
-                                    <div className="item-icon">{reward.image || 'i'}</div>
+                                    <div className="item-icon">{reward.image || ACTION_ICONS.reward}</div>
                                     <div className="item-name">{reward.name}</div>
-                                    <div className="item-info">{reward.cost} נקודות </div>
+                                    <div className="item-info">{reward.cost} {t('parent.points')}</div>
                                 </div>
                             ))}
                         </div>
                     </div>
                 )}
 
-                {/* Modals */}
-                <AddChildModal
-                    isOpen={showAddChild}
-                    onClose={() => { setShowAddChild(false); setEditChild(null); }}
-                    onSubmit={addChild}
-                    editData={editChild}
-                />
-                <AddTaskModal
-                    isOpen={showAddTask}
-                    onClose={() => { setShowAddTask(false); setEditTask(null); }}
-                    onSubmit={addTask}
-                    editData={editTask}
-                />
-                <AddRewardModal
-                    isOpen={showAddReward}
-                    onClose={() => { setShowAddReward(false); setEditReward(null); }}
-                    onSubmit={addReward}
-                    editData={editReward}
-                />
-                <AssignTaskModal
-                    isOpen={showAssignTask}
-                    onClose={() => setShowAssignTask(false)}
-                    onSubmit={assignTask}
-                    children={children}
-                    tasks={tasks}
-                />
-                <PenaltyModal
-                    isOpen={showPenalty}
-                    onClose={() => setShowPenalty(false)}
-                    onSubmit={addPenalty}
-                    children={children}
-                />
-
-
+                {/* History Tab */}
+                {activeTab === 'history' && (
+                    <div className="history-section">
+                        <h2>{t('parent.tabs.history')}</h2>
+                        {allTransactions.length === 0 ? (
+                            <p className="empty-message">{t('parent.emptyHistory')}</p>
+                        ) : (
+                            <div className="history-list">
+                                {allTransactions.filter(t => t.is_reviewed).map(transaction => (
+                                    <div key={transaction.id} className="history-item">
+                                        <div className="transaction-info">
+                                            <div className="transaction-child">{transaction.child_name}</div>
+                                            <div className="transaction-desc">{transaction.description}</div>
+                                            <div className="transaction-date">{new Date(transaction.timestamp).toLocaleDateString()}</div>
+                                        </div>
+                                        <div className="transaction-amount" style={{ color: transaction.amount > 0 ? '#4caf50' : '#f44336' }}>
+                                            {transaction.amount > 0 ? '+' : ''}{transaction.amount} {t('parent.points')}
+                                        </div>
+                                        <button
+                                            className="item-action-btn delete"
+                                            onClick={() => deleteTransaction(transaction.id)}
+                                            title={t('parent.deleteTransaction')}
+                                        >
+                                            {ACTION_ICONS.delete}
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
+            {/* Modals */}
+            <AddChildModal
+                isOpen={showAddChild}
+                onClose={() => { setShowAddChild(false); setEditChild(null); }}
+                onSubmit={addChild}
+                editData={editChild}
+            />
+            <AddTaskModal
+                isOpen={showAddTask}
+                onClose={() => { setShowAddTask(false); setEditTask(null); }}
+                onSubmit={addTask}
+                editData={editTask}
+            />
+            <AddRewardModal
+                isOpen={showAddReward}
+                onClose={() => { setShowAddReward(false); setEditReward(null); }}
+                onSubmit={addReward}
+                editData={editReward}
+            />
+            <AssignTaskModal
+                isOpen={showAssignTask}
+                onClose={() => {
+                    setShowAssignTask(false);
+                    setPreselectedAssignmentId(null);
+                }}
+                onSubmit={assignTask}
+                onBulkSubmit={assignMultipleTasks}
+                children={children}
+                tasks={tasks}
+                selectedTasks={selectedTasks}
+                allAssignments={allAssignments}
+                preselectedTaskId={preselectedAssignmentId ? allAssignments.find(a => a.id === preselectedAssignmentId)?.task_id : null}
+            />
+            <PenaltyModal
+                isOpen={showPenalty}
+                onClose={() => setShowPenalty(false)}
+                onSubmit={addPenalty}
+                children={children}
+            />
+
+            {/* Confirm Dialog */}
+            <ConfirmDialog
+                isOpen={confirmDialog !== null}
+                message={confirmDialog?.message}
+                onConfirm={confirmDialog?.onConfirm}
+                onCancel={confirmDialog?.onCancel}
+                confirmText={t('modal.confirm')}
+                cancelText={t('modal.cancel')}
+            />
+
+            {/* Prompt Dialog */}
+            {promptDialog && (
+                <PromptDialog
+                    message={promptDialog.message}
+                    defaultValue={promptDialog.defaultValue}
+                    onConfirm={promptDialog.onConfirm}
+                    onCancel={promptDialog.onCancel}
+                    confirmText={t('modal.save')}
+                    cancelText={t('modal.cancel')}
+                />
+            )}
         </div>
-    )
-};
+    );
+}
 
 export default ParentDashboard;

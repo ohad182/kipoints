@@ -16,18 +16,18 @@ function AssignTaskModal({ isOpen, onClose, onSubmit, onBulkSubmit, children, ta
   // Reset form when modal opens/closes
   useEffect(() => {
     if (!isOpen) {
-      setselectedchild('');
-      setselectedTask('');
+      setSelectedChild('');
+      setSelectedTask('');
       setPoints('');
     } else if (preselectedTaskId) {
       // Set the preselected task when modal opens
       setSelectedTask(preselectedTaskId.toString());
     }
-  }, [isopen, preselectedTaskId]);
+  }, [isOpen, preselectedTaskId]);
 
   // Clear selected child when task changes(to avoid invalid state)
   useEffect(() => {
-    if (selectedTask && selectedchild && selectedchild !== 'all') {
+    if (selectedTask && selectedChild && selectedChild !== 'all') {
       // Check if the currently selected child is now disabled for the new task
       if (isTaskAssignedToChild(parseInt(selectedChild), parseInt(selectedTask))) {
         setSelectedChild('');

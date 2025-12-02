@@ -1,7 +1,7 @@
 import { ACTION_ICONS } from '../config/icons';
 import './ConfirmDialog.css';
 
-function ConfirmDialog({ isopen, title, message, onConfirm, onCancel, confirmText = 'Confirm', cancelText = 'Cancel' }) {
+function ConfirmDialog({ isOpen, title, message, onConfirm, onCancel, confirmText = 'Confirm', cancelText = 'Cancel' }) {
     if (!isOpen) return null;
 
     return (

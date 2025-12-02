@@ -69,7 +69,7 @@ export const CATEGORY_ICONS = {
     morning: '🌅',
     afternoon: '☀️',
     evening: '🌙',
-    other: '🗓️'
+    other: '📌'
 };
 
 export const ACTION_ICONS = {
@@ -83,7 +83,10 @@ export const ACTION_ICONS = {
     error: '❌',
     warning: '⚠️',
     info: '💡',
-    camera: '📸'
+    camera: '📸',
+    edit: '✏',
+    delete: '🗑️',
+    smile: '🙂'
 };
 
 export const CHILD_ICONS = {

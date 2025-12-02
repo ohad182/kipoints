@@ -1,7 +1,11 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { api } from "../api";
-import { useSocket } from "../SocketContext";
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { api } from '../api';
+import { useSocket } from '../SocketContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useNotification } from '../contexts/NotificationContext';
+import ConfirmDialog from '../components/ConfirmDialog';
+import { CATEGORY_ICONS, ACTION_ICONS } from '../config/icons';
 import './ChildDashboard.css';
 
 function ChildDashboard() {
@@ -10,7 +14,28 @@ function ChildDashboard() {
     const [child, setChild] = useState(null);
     const [tasks, setTasks] = useState({ morning: [], afternoon: [], evening: [], other: [] });
     const [rewards, setRewards] = useState([]);
+    const [completedToday, setCompletedToday] = useState({});
+
+    // Function to get category based on current time
+    const getTimeBasedCategory = () => {
+        const hour = new Date().getHours();
+        if (hour >= 5 && hour < 12) {
+            return 'morning';// 5:00 AM - 11:59 AM
+        } else if (hour >= 12 && hour < 18) {
+            return 'afternoon'; // 12:00 PM - 5:59 PM
+        } else if (hour >= 18 && hour < 22) {
+            return 'evening'; // 6:00 PM - 9:59 PM
+        } else {
+            return 'evening'; // 10:00 PM - 4:59 AM  (default to evening)
+        }
+    };
+
+    const [activeCategory, setActiveCategory] = useState(getTimeBasedCategory);
+    const [view, setView] = useState('tasks'); // 'tasks' or 'rewards'
+    const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
     const { socket } = useSocket();
+    const { t } = useLanguage();
+    const { showNotification } = useNotification();
 
     useEffect(() => {
         loadData();
@@ -19,15 +44,21 @@ function ChildDashboard() {
     useEffect(() => {
         if (!socket) return;
 
-        socket.on('transactionAdded', (data) => {
+        socket.on('transactionAdded', async (data) => {
             if (data.child.id === parseInt(id)) {
                 setChild(data.child);
+                // Reload completed tasks to update the UI
+                const completedData = await api.getCompletedToday(id);
+                setCompletedToday(completedData);
             }
         });
 
-        socket.on('transactionReviewed', (data) => {
+        socket.on('transactionReviewed', async (data) => {
             if (data.child.id === parseInt(id)) {
                 setChild(data.child);
+                // Reload completed tasks when review happens
+                const completedData = await api.getCompletedToday(id);
+                setCompletedToday(completedData);
             }
         });
 
@@ -38,14 +69,16 @@ function ChildDashboard() {
     }, [socket, id]);
 
     const loadData = async () => {
-        const [childData, assignments, rewardsData] = await Promise.all([
+        const [childData, assignments, rewardsData, completedData] = await Promise.all([
             api.getChildren().then(children => children.find(c => c.id === parseInt(id))),
             api.getAssignments(id),
-            api.getRewards()
+            api.getRewards(),
+            api.getCompletedToday(id)
         ]);
 
         setChild(childData);
         setRewards(rewardsData);
+        setCompletedToday(completedData);
 
         const grouped = {
             morning: assignments.filter(a => a.category === 'morning'),
@@ -57,83 +90,199 @@ function ChildDashboard() {
     };
 
     const completeTask = async (task) => {
+        // Check if task is once-per-day and already completed
+        if (task.completion_type === 'once' && completedToday[task.id]) {
+            showNotification(t('child.alreadyCompleted'), 'warning');
+            return;
+        }
+
         await api.addTransaction({
             child_id: parseInt(id),
             action_type: 'task',
             amount: task.points,
-            description: task.name
+            description: task.name,
+            task_assignment_id: task.id
         });
+
+        // Update local state
+        if (task.completion_type === 'once') {
+            setCompletedToday(prev => ({
+                ...prev,
+                [task.id]: 1
+            }));
+        }
+
+        showNotification(t('child.taskCompleted', { points: task.points }), 'success');
     };
 
     const buyReward = async (reward) => {
         if (child.balance < reward.cost) {
-            alert("אין מספיק נקודות לרכוש את הפרס הזה.");
+            showNotification(t('child.notEnoughPoints'), 'error');
             return;
         }
 
-        if(confirm(`האם אתה בטוח שברצונך לרכוש את הפרס "${reward.name}" ב-${reward.cost} נקודות?`)) {
-            await api.addTransaction({
-                child_id: parseInt(id),
-                action_type: 'reward',
-                amount: -reward.cost,
-                description: ` קנייה:${reward.name}`
-            });
-        }
+        setConfirmDialog({
+            isOpen: true,
+            title: t('child.confirmPurchaseTitle'),
+            message: t('child.confirmpurchase', { name: reward.name, cost: reward.cost }),
+            onConfirm: async () => {
+                await api.addTransaction({
+                    child_id: parseInt(id),
+                    action_type: 'reward',
+                    amount: -reward.cost,
+                    description: `${t('child.purchasePrefix')}${reward.name}`
+                });
+                showNotification(t('child.rewardPurchased', { name: reward.name }), 'success');
+                setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: null });
+            }
+        });
     };
 
-    if (!child) return <div className="loading">טוען...</div>;
+    if (!child) return <div className="loading">{t('child.loading')}</div>;
+
+    const currentTasks = tasks[activeCategory] || [];
+    const categories = [
+        { id: 'morning', icon: CATEGORY_ICONS.morning, label: t('categories.morning') },
+        { id: 'afternoon', icon: CATEGORY_ICONS.afternoon, label: t('categories.afternoon') },
+        { id: 'evening', icon: CATEGORY_ICONS.evening, label: t('categories.evening') },
+        { id: 'other', icon: CATEGORY_ICONS.other, label: t('categories.other') }
+    ];
 
     return (
         <div className="child-dashboard">
-            <button className="back-button" onClick={() => navigate('/child')}>← חזרה</button>
-
-            <div className="dashboard-header">
-                <h1>שלום {child.name}!</h1>
-                <div className="balance-display">
-                    <span className="balance-label">היתרה שלך:</span>
-                    <span className="balance-amount">{child.balance}</span>
-                    <span className="balance-label">נקודות</span>
+            {/* Top Bar */}
+            <div className="top-bar">
+                <button className="back-button" onClick={() => navigate('/child')}>
+                    {t('child.back')}
+                </button>
+                <div className="child-name">{child.name}</div>
+                <div className="balance-chip">
+                    <span className="balance-icon">{ACTION_ICONS.bonus}</span>
+                    <span className="balance-value">{child.balance}</span>
                 </div>
             </div>
 
-            <div className="tasks-section">
-                <h2>משימות זמינות</h2>
-                {['morning', 'afternoon', 'evening', 'other'].map(category => (
-                    <div key={category} className="task-category">
-                        <h3>
-                            {category === 'morning' && 'בוקר' }
-                             {category === 'afternoon' && 'צהריים'}
-                             {category === 'evening' && 'ערב'}
-                             {category === 'other' && 'אחר'}
-                        </h3>
-                        <div className="tasks-grid">
-                            {tasks[category].map(task => (
-                                    <div key={task.id} className="task-card" onClick={() => completeTask(task)}>
-                                        <div className="task-icon">{task.icon || '✔'}</div>
-                                        <div className="task-name">{task.name}</div>
-                                        <div className="task-points">+{task.points} נקודות</div>
-                                    </div>
-                                ))}
+            {/* Main Content Area */}
+            <div className="main-content">
+                {/* View Toggle */}
+                <div className="view-toggle">
+                    <button
+                        className={`toggle-btn ${view === 'tasks' ? 'active' : ''}`}
+                        onClick={() => setView('tasks')}
+                    >
+                        {ACTION_ICONS.task} {t('child.myTasks')}
+                    </button>
+                    <button
+                        className={`toggle-btn ${view === 'rewards' ? 'active' : ''}`}
+                        onClick={() => setView('rewards')}
+                    >
+                        {ACTION_ICONS.reward} {t('child.rewards')}
+                    </button>
+                </div>
+
+                {view === 'tasks' ? (
+                    <div className="tasks-view">
+                        {/* Category Tabs */}
+                        <div className="category-tabs">
+                            {categories.map(cat => (
+                                <button
+                                    key={cat.id}
+                                    className={`category-tab ${activeCategory === cat.id ? 'active' : ''}`}
+                                    onClick={() => setActiveCategory(cat.id)}
+                                >
+                                    <span className="tab-icon">{cat.icon}</span>
+                                    <span className="tab-label">{cat.label}</span>
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Tasks Grid */}
+                        <div className="tasks-container">
+                            {currentTasks.length === 0 ? (
+                                <div className="empty-state">
+                                    <div className="empty-icon">{ACTION_ICONS.smile}</div>
+                                    <div className="empty-text">{t('child.noTasks')}</div>
+                                </div>
+                            ) : (
+                                <div className="tasks-grid-new">
+                                    {currentTasks.map(task => {
+                                        const isCompleted = task.completion_type === 'once' && completedToday[task.id];
+                                        return (
+                                            <button
+                                                key={task.id}
+                                                className={`task-card-new ${isCompleted ? 'completed' : ''}`}
+                                                onClick={() => completeTask(task)}
+                                                disabled={isCompleted}
+                                            >
+                                                <div className="task-card-content">
+                                                    <div className="task-icon-large">{task.icon || ACTION_ICONS.task}</div>
+                                                    <div className="task-name-new">{task.name}</div>
+                                                    {isCompleted ? (
+                                                        <div className="task-status">{ACTION_ICONS.completed} {t('child.done')}</div>
+                                                    ) : (
+                                                        <div className="task-points-new">+{task.points}  {ACTION_ICONS.bonus}</div>
+                                                    )}
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
                     </div>
-                ))}
+                ) : (
+                    <div className="rewards-view" >
+                        <div className="rewards-container">
+                            {rewards.length === 0 ? (
+                                <div className="empty-state">
+                                    <div className="empty-icon">{ACTION_ICONS.reward}</div>
+                                    <div className="empty-text">{t('child.noRewards')}</div>
+                                </div>
+                            ) : (
+                                <div className="rewards-grid-new">
+                                    {rewards.map(reward => {
+                                        const canAfford = child.balance >= reward.cost;
+                                        return (
+                                            <button
+                                                key={reward.id}
+                                                className={`reward-card-new ${!canAfford ? 'disabled' : ''}`}
+                                                onClick={() => buyReward(reward)}
+                                                disabled={!canAfford}
+                                            >
+                                                <div className="reward-card-content">
+                                                    <div className="reward-image-large">{reward.image || ACTION_ICONS.reward}</div>
+                                                    <div className="reward-name-new">{reward.name}</div>
+                                                    <div className={`reward-cost-new ${!canAfford ? 'too-expensive' : ''}`}>
+                                                        {reward.cost} {ACTION_ICONS.bonus}
+                                                    </div>
+                                                    {!canAfford && (
+                                                        <div className="need-more">
+                                                            {t('child.need')} {reward.cost - child.balance} {t('child.more')}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
 
-            <div className="rewards-section">
-                <h2>פרסים לרכישה</h2>
-                <div className="rewards-grid">
-                    {rewards.map(reward => (
-                        <div key={reward.id} className={`reward-card ${child.balance < reward.cost ? 'disabled' : ''}`} onClick={() => buyReward(reward)}>
-                            <div className="reward-image">{reward.image || '🎁'}</div>
-                            <div className="reward-name">{reward.name}</div>
-                            <div className="reward-cost">{reward.cost} נקודות</div>
-                        </div>
-                    ))}
-                </div>
-            </div>
+            {/* Confirm Dialog */}
+            <ConfirmDialog
+                isopen={confirmDialog.isOpen}
+                title={confirmDialog.title}
+                message={confirmDialog.message}
+                onConfirm={confirmDialog.onConfirm}
+                onCancel={() => setconfirmDialog({ isopen: false, title: '', message: '', onConfirm: null })}
+                confirmText={t('modal.confirm')}
+                cancelText={t('modal.cancel')}
+            />
         </div>
     );
-
 }
 
 export default ChildDashboard;

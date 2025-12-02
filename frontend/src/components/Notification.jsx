@@ -6,7 +6,7 @@ function Notification({ message, type = 'info', onClose, duration = 3000 }) {
     useEffect(() => {
         if (duration > 0) {
             const timer = setTimeout(() => {
-                onclose();
+                onClose();
             }, duration);
             return () => clearTimeout(timer);
         }
@@ -23,14 +23,14 @@ function Notification({ message, type = 'info', onClose, duration = 3000 }) {
     };
 
     return (
-        <div ClassName={`notification ${type}`}>
-            <div ClassName="notification-content">
-                <span ClassName="notification-icon">
-                    {geticon()}
+        <div className={`notification ${type}`}>
+            <div className="notification-content">
+                <span className="notification-icon">
+                    {getIcon()}
                 </span>
-                <span ClassName="notification-message">{message}</span>
+                <span className="notification-message">{message}</span>
             </div>
-            <button ClassName="notification-close" onClick={onClose}>x</button>
+            <button className="notification-close" onClick={onClose}>x</button>
         </div>
     );
 }

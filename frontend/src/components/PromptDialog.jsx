@@ -39,4 +39,4 @@ function PromptDialog({ message, defaultValue = '', onConfirm, onCancel, confirm
     );
 }
     
-export default promptDialog;
+export default PromptDialog;
