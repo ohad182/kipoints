@@ -16,16 +16,6 @@
     border-bottom: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Top Bar */
-.top-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 2rem;
-    backdrop-filter: blur(10px);
-    border-bottom: 2px solid rgba(255, 255, 255, 0.15);
-}
-
 .back-button {
     background: rgba(255, 255, 255, 0.9);
     color: #667eea;
