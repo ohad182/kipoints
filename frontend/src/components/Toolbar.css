@@ -11,12 +11,14 @@
     justify-content: space-between;
     padding: 0 20px;
     z-index: 1000;
+    direction: ltr; /* Always keep toolbar LTR for consistent layout */
 }
 
 .toolbar-left {
     display: flex;
     align-items: center;
     gap: 15px;
+    order: 1; /* Ensure left section stays on the left */
 }
 
 .toolbar-title {
@@ -31,6 +33,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    order: 2; /* Ensure right section stays on the right */
 }
 
 .toolbar-button {

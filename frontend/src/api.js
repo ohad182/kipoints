@@ -39,6 +39,7 @@ export const api = {
     // Assignments API
     getAssignments: (childId) => fetch(`${getApiUrl()}/assignments/${childId}`).then(res => res.json()),
     getCompletedToday: (childId) => fetch(`${getApiUrl()}/assignments/${childId}/completed-today`).then(res => res.json()),
+    getPendingTasks: (childId) => fetch(`${getApiUrl()}/children/${childId}/pending-tasks`).then(res => res.json()),
     addAssignment: (data) => fetch(`${getApiUrl()}/assignments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -82,7 +83,19 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ approved })
     }).then(res => res.json()),
+    undoTransaction: (id) => fetch(`${getApiUrl()}/transactions/${id}/undo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    }).then(res => res.json()),
     deleteTransaction: (id) => fetch(`${getApiUrl()}/transactions/${id}`, {
         method: 'DELETE'
+    }).then(res => res.json()),
+
+    // Backup/Restore API
+    exportData: () => fetch(`${getApiUrl()}/export`).then(res => res.blob()),
+    importData: (data) => fetch(`${getApiUrl()}/import`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data })
     }).then(res => res.json()),
 };

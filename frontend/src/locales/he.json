@@ -15,16 +15,17 @@
             "tasks": "משימות",
             "assignments": "שיוכים",
             "rewards": "פרסים",
-            "history": "היסטוריה"
+            "history": "היסטוריה",
+            "backup": "גיבוי"
         },
         "addChild": "הוסף ילד +",
         "addTask": "הוסף משימה +",
         "assignTask": "שיוך משימה לילד 🔗",
         "assignSelectedTask": "שיוך משימה נבחרת 🔗",
         "assignSelected": "שיוך נבחרות",
-        "clearSelection": "נקה בחירה",
+        "clearSelection": "נקה בחירה ✗",
         "addReward": "הוסף פרס +",
-        "addPenalty": "הוסף קנס",
+        "addPenalty": "הוסף קנס ➖",
         "deleteTransaction": "מחק טרנזקציה",
         "emptyPending": "אין משימות ממתינות לבדיקה",
         "emptyChildren": "אין ילדים עדיין",
@@ -32,8 +33,10 @@
         "emptyAssignments": "אין שיוכים עדיין",
         "emptyRewards": "אין פרסים עדיין",
         "emptyHistory": "אין היסטוריית טרנזקציות עדיין",
-        "approve": "אישור ✔",
-        "reject": "דחייה ✖",
+        "approve": "אישור ✓",
+        "reject": "דחייה ✗",
+        "approveAll": "אשר הכל ✓",
+        "rejectAll": "דחה הכל ✗",
         "points": "נקודות",
         "filterAll": "כל הילדים"
     },
@@ -52,13 +55,15 @@
         "confirmPurchase": "האם אתה בטוח שברצונך לרכוש את הפרס \"{name}\" ב-{cost} נקודות?",
         "purchasePrefix": "קנייה:",
         "done": "הושלם",
-        "alreadyCompleted": "המשימה כבר הושלמה היום",
+        "alreadyCompleted": "המשימה כבר הושלמה היום!",
         "taskCompleted": "כל הכבוד! קיבלת +{points} נקודות!",
         "rewardPurchased": "הפרס '{name}' נרכש בהצלחה!",
         "noTasks": "אין משימות בקטגוריה זו",
         "noRewards": "אין פרסים זמינים כרגע",
         "need": "צריך עוד",
-        "more": "נקודות"
+        "more": "נקודות",
+        "undo": "ביטול",
+        "taskUndone": "ביטול השלמת משימה"
     },
     "categories": {
         "morning": "בוקר",
@@ -109,12 +114,12 @@
     "settings": {
         "title": "הגדרות",
         "backendUrl": "כתובת שרת Backend",
-        "backendHelp": "הזן את כתובת שרת ה-Backend (לדוגמא: http://192.168.100:3000)",
+        "backendHelp": "הזן את כתובת שרת ה-Backend (לדוגמא: http://192.168.1.100:3000)",
         "reset": "איפוס לברירת מחדל",
         "saved": "ההגדרות נשמרו! אנא רענן את הדף כדי שהשינויים ייכנסו לתוקף."
     },
     "confirm": {
-        "deleteChild": "האם אתה בטוח שברצונך למחור ילד זה? כל הנתונים שלו יימחקו.",
+        "deleteChild": "האם אתה בטוח שברצונך למחוק ילד זה? כל הנתונים שלו יימחקו.",
         "deleteTask": "האם אתה בטוח שברצונך למחוק משימה זו?",
         "deleteReward": "האם אתה בטוח שברצונך למחוק פרס זה?",
         "deleteAssignment": "האם אתה בטוח שברצונך למחוק שיוך זה?",
@@ -122,16 +127,30 @@
     },
     "alerts": {
         "taskAssigned": "המשימה שויכה בהצלחה!",
-        "taslAlreadyAssigned": "שגיאה: המשימה כבר משויכת לילד זה",
-        "multipleTasksAssigned": "{count} משימות שויכו בהצלחה",
+        "taskAlreadyAssigned": "שגיאה: המשימה כבר משויכת לילד זה",
+        "multipleTasksAssigned": "{count} משימות שויכו בהצלחה!",
         "someTasksAlreadyAssigned": "שגיאה: חלק מהמשימות כבר משויכות לילד זה",
         "childDeleted": "הילד נמחק בהצלחה",
         "taskDeleted": "המשימה נמחקה בהצלחה",
         "rewardDeleted": "הפרס נמחק בהצלחה",
         "assignmentDeleted": "השיוך נמחק בהצלחה",
         "pointsUpdated": "הנקודות עודכנו בהצלחה",
-        "trasactionDeleted": "הטרנזקציה נמחקה בהצלחה",
+        "transactionDeleted": "הטרנזקציה נמחקה בהצלחה",
         "transactionDeleteError": "לא ניתן למחוק טרנזקציות שלא נבדקו"
+    },
+    "backup": {
+        "export": "ייצוא נתונים",
+        "exportDesc": "הורדת קובץ גיבוי המכיל את כל הנתונים שלך",
+        "exportButton": "הורד גיבוי",
+        "exportSuccess": "הגיבוי הורד בהצלחה",
+        "exportError": "ייצוא הנתונים נכשל",
+        "import": "ייבוא נתונים",
+        "importDesc": "שחזור נתונים מקובץ גיבוי",
+        "importButton": "בחר קובץ גיבוי",
+        "importWarning": "פעולה זו תחליף את כל הנתונים הקיימים. וודא שיש לך גיבוי!",
+        "confirmImport": "אשר ייבוא נתונים",
+        "importSuccess": "הנתונים יובאו בהצלחה הדף ייטען מחדש.",
+        "importError": "ייבוא הנתונים נכשל. אנא בדוק את פורמט הקובץ."
     },
     "prompts": {
         "howManyPoints": "כמה נקודות?"

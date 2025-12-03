@@ -1,3 +1,158 @@
 {
-    
+    "appTitle": "Points System",
+    "app": {
+        "title": "Points System"
+    },
+    "home": {
+        "parentButton": "Parent Login",
+        "childButton": "Child Login"
+    },
+    "parent": {
+        "dashboard": "Parent Dashboard",
+        "tabs": {
+            "review": "Review",
+            "children": "Children",
+            "tasks": "Tasks",
+            "assignments": "Assignments",
+            "rewards": "Rewards",
+            "history": "History",
+            "backup": "Backup"
+        },
+        "addChild": "+ Add Child",
+        "addTask": "+ Add Task",
+        "assignTask": "🔗 Assign Task to Child",
+        "assignSelectedTask": "🔗 Assign Selected Task",
+        "assignSelected": "Assign Selected",
+        "clearSelection": "✗ Clear Selection",
+        "addReward": "+ Add Reward",
+        "addPenalty": "➖ Add Penalty",
+        "deleteTransaction": "Delete Transaction",
+        "emptyPending": "No pending tasks to review",
+        "emptyChildren": "No children yet",
+        "emptyTasks": "No tasks yet",
+        "emptyAssignments": "No assignments yet",
+        "emptyHistory": "No transaction history yet",
+        "emptyRewards": "No rewards yet",
+        "approve": "✓ Approve",
+        "reject": "✗ Reject",
+        "points": "points",
+        "filterAll": "All Children"
+    },
+    "child": {
+        "selectChild": "Select Your Picture",
+        "greeting": "Hello {name}!",
+        "balance": "Your balance:",
+        "points": "points",
+        "myTasks": "My Tasks",
+        "rewards": "Available Rewards",
+        "back": "← Back",
+        "loading": "Loading...",
+        "noChildren": "No children in the system. A parent needs to add children first.",
+        "notEnoughPoints": "Not enough points to purchase this reward.",
+        "confirmPurchaseTitle": "Purchase Reward",
+        "confirmPurchase": "Are you sure you want to purchase \"{name}\" for {cost} points?",
+        "purchasePrefix": "Purchase: ",
+        "done": "Done",
+        "alreadyCompleted": "Task already completed today!",
+        "taskCompleted": "Great job! You earned +{points} points!",
+        "rewardPurchased": "Reward '{name}' purchased successfully!",
+        "noTasks": "No tasks in this category",
+        "noRewards": "No rewards available",
+        "need": "Need",
+        "more": "more"
+    },
+    "categories": {
+        "morning": "🌅 Morning",
+        "afternoon": "☀️ Afternoon",
+        "evening": "🌙 Evening",
+        "other": "📌 Other"
+    },
+    "modal": {
+        "addChild": "Add New Child",
+        "editChild": "Edit Child",
+        "childName": "Child Name",
+        "selectImage": "Select Image:",
+        "orUploadImage": "Or Upload Custom Image:",
+        "uploadImage": "Click to upload image",
+        "cancel": "Cancel",
+        "save": "Save",
+        "update": "Update",
+        "confirm": "Confirm",
+        "addTask": "Add New Task",
+        "editTask": "Edit Task",
+        "taskName": "Task Name",
+        "category": "Category",
+        "points": "Points",
+        "icon": "Select Icon:",
+        "completionType": "Completion Type",
+        "completionOnce": "🔒 Once Per Day",
+        "completionMultiple": "🔄 Multiple Times",
+        "assignTask": "Assign Task to Child",
+        "assignMultipleTasks": "Assign Multiple Tasks to Child",
+        "selectedTasks": "Selected Tasks",
+        "selectChild": "Select Child",
+        "allChildren": "All Children",
+        "alreadyAssigned": "already assigned",
+        "selectTask": "Select Task",
+        "assign": "Assign",
+        "addReward": "Add New Reward",
+        "editReward": "Edit Reward",
+        "rewardName": "Reward Name",
+        "cost": "Cost",
+        "addPenalty": "Add Penalty",
+        "reason": "Reason",
+        "amount": "Amount"
+    },
+    "completionType": {
+        "once": "🔒 Once Per Day",
+        "multiple": "🔄 Multiple"
+    },
+    "settings": {
+        "title": "Settings",
+        "backendUrl": "Backend Server URL",
+        "backendHelp": "Enter the URL of your backend server (e.g., http://192.168.1.100:3000)",
+        "reset": "Reset to Default",
+        "saved": "Settings saved! Please refresh the page for changes to take effect."
+    },
+    "confirm": {
+        "deleteChild": "Are you sure you want to delete this child? All their data will be deleted.",
+        "deleteTask": "Are you sure you want to delete this task?",
+        "deleteReward": "Are you sure you want to delete this reward?",
+        "deleteAssignment": "Are you sure you want to delete this assignment?",
+        "deleteTransaction": "Are you sure you want to delete this transaction from history?"
+    },
+    "alerts": {
+        "taskAssigned": "Task assigned successfully!",
+        "taskAlreadyAssigned": "Error: Task already assigned to this child",
+        "multipleTasksAssigned": "{count} tasks assigned successfully!",
+        "someTasksAlreadyAssigned": "Error: Some tasks are already assigned to this child",
+        "childDeleted": "Child deleted successfully",
+        "taskDeleted": "Task deleted successfully",
+        "rewardDeleted": "Reward deleted successfully",
+        "assignmentDeleted": "Assignment deleted successfully",
+        "pointsUpdated": "Points updated successfully",
+        "transactionDeleted": "Transaction deleted successfully",
+        "transactionDeleteError": "Cannot delete unreviewed transactions"
+    },
+    "backup": {
+        "export": "Export Data",
+        "exportDesc": "Download a backup file containing all your data",
+        "exportButton": "Download Backup",
+        "exportSuccess": "Backup downloaded successfully",
+        "exportError": "Failed to export data",
+        "import": "Import Data",
+        "importDesc": "Restore data from a backup file",
+        "importButton": "Choose Backup File",
+        "importWarning": "This will replace ALL current data. Make sure you have a backup!",
+        "confirmImport": "Confirm Data Import",
+        "importSuccess": "Data imported successfully. Page will reload.",
+        "importError": "Failed to import data. Please check the file format."
+    },
+    "prompts": {
+        "howManyPoints": "How many points?"
+    },
+    "buttons": {
+        "updatePoints": "Update Points",
+        "deleteAssignment": "Delete Assignment"
+    }
 }

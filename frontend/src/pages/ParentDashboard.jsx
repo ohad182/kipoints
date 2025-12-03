@@ -85,6 +85,11 @@ function ParentDashboard() {
         socket.on('assignmentUpdated', () => loadAllAssignments());
         socket.on('assignmentDeleted', () => loadAllAssignments());
 
+        socket.on('dataImported', () => {
+            // Reload all data when import happens
+            loadData();
+        });
+
         return () => {
             socket.off('transactionAdded');
             socket.off('transactionReviewed');
@@ -346,6 +351,51 @@ function ParentDashboard() {
         await api.reviewTransaction(id, approved);
     };
 
+    const handleExport = async () => {
+        try {
+            const blob = await api.exportData();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `points-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            showNotification(t('backup.exportSuccess'), 'success');
+        } catch (error) {
+            showNotification(t('backup.exportError'), 'error');
+        }
+    };
+
+    const handleImport = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        setConfirmDialog({
+            message: t('backup.importWarning'),
+            onConfirm: async () => {
+                try {
+                    const text = await file.text();
+                    const data = JSON.parse(text);
+                    await api.importData(data);
+                    showNotification(t('backup.importSuccess'), 'success');
+                    // Reload page after successful import
+                    setTimeout(() => window.location.reload(), 2000);
+                } catch (error) {
+                    showNotification(t('backup.importError'), 'error');
+                }
+                setConfirmDialog(null);
+                // Reset file input
+                event.target.value = '';
+            },
+            onCancel: () => {
+                setConfirmDialog(null);
+                event.target.value = '';
+            }
+        });
+    };
+
     return (
         <div className="parent-dashboard">
             <button className="back-button" onClick={() => navigate('/')}>{t('child.back')}</button>
@@ -388,6 +438,12 @@ function ParentDashboard() {
                     onClick={() => setActiveTab('history')}
                 >
                     {t('parent.tabs.history')}
+                </button>
+                <button
+                    className={activeTab === 'backup' ? 'active' : ''}
+                    onClick={() => setActiveTab('backup')}
+                >
+                    {t('parent.tabs.backup')}
                 </button>
             </div>
 
@@ -641,6 +697,37 @@ function ParentDashboard() {
                                 ))}
                             </div>
                         )}
+                    </div>
+                )}
+
+                {/* Backup Tab */}
+                {activeTab === 'backup' && (
+                    <div className="backup-section">
+                        <h2>{t('parent.tabs.backup')}</h2>
+
+                        <div className="backup-card">
+                            <h3>{ACTION_ICONS.download} {t('backup.export')}</h3>
+                            <p>{t('backup.exportDesc')}</p>
+                            <button className="backup-button primary" onClick={handleExport}>
+                                {t('backup.exportButton')}
+                            </button>
+                        </div>
+
+                        <div className="backup-card">
+                            <h3>{ACTION_ICONS.upload} {t('backup.import')}</h3>
+                            <p>{t('backup.importDesc')}</p>
+                            <p className="backup-warning">{ACTION_ICONS.warning} {t('backup.importWarning')}</p>
+                            <input
+                                type="file"
+                                accept=".json"
+                                onChange={handleImport}
+                                style={{ display: 'none' }}
+                                id="import-file"
+                            />
+                            <label htmlFor="import-file" className="backup-button secondary">
+                                {t('backup.importButton')}
+                            </label>
+                        </div>
                     </div>
                 )}
             </div>

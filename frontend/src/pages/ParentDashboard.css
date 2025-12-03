@@ -1,8 +1,8 @@
 .parent-dashboard {
-  min-height: calc(100vh - 60px);
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
+    min-height: calc(100vh - 60px);
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .parent-dashboard h1 {
@@ -47,7 +47,7 @@
     position: relative;
 }
 
-.tab-content > div {
+.tab-content>div {
     animation: fadeIn 0.2s ease-in;
 }
 
@@ -55,6 +55,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -120,7 +121,8 @@
     gap: 0.5rem;
 }
 
-.approve-button, .reject-button {
+.approve-button,
+.reject-button {
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 8px;
@@ -148,7 +150,7 @@
 }
 
 .management-section {
-    display:flex;
+    display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
@@ -238,7 +240,7 @@
     justify-content: center;
     font-size: 1.2rem;
     font-weight: bold;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 [dir="rtl"] .selection-checkbox {
@@ -426,7 +428,8 @@
         width: 100%;
     }
 
-    .approve-button, .reject-button {
+    .approve-button,
+    .reject-button {
         flex: 1;
     }
 
@@ -502,4 +505,76 @@
     font-weight: bold;
     min-width: 100px;
     text-align: right;
+}
+
+/* Backup Section */
+.backup-section {
+    padding: 20px;
+}
+
+.backup-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e0e0e0;
+}
+
+.backup-card h3 {
+    margin-top: 0;
+    color: #333;
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+}
+
+.backup-card p {
+    color: #666;
+    margin: 12px 0;
+    line-height: 1.6;
+}
+
+.backup-warning {
+    color: #f44336 !important;
+    font-weight: 600;
+    background: #ffebee;
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 4px solid #f44336;
+    margin: 16px 0 !important;
+}
+
+.backup-button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-block;
+    margin-top: 12px;
+}
+
+.backup-button.primary {
+    background: #4caf50;
+    color: white;
+}
+
+.backup-button.primary:hover {
+    background: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.backup-button.secondary {
+    background: #2196f3;
+    color: white;
+    text-decoration: none;
+}
+
+.backup-button.secondary:hover {
+    background: #1976d2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
 }

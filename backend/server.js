@@ -89,6 +89,19 @@ app.get('/api/assignments/:childId', (req, res) => {
 // Get completed tasks for today
 app.get('/api/assignments/:childId/completed-today', (req, res) => {
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+    // Get all cancelled transaction IDs from reversal entries
+    const cancelledIds = db.prepare(`
+    SELECT CAST(SUBSTR(description, INSTR(description, 'ID ') + 3,
+    INSTR(SUBSTR(description, INSTR(description, 'ID ') + 3), ' ') - 1) AS INTEGER) as cancelled_id
+    FROM transaction_log
+    WHERE child_id= ?
+    AND action_type = 'penalty'
+    AND DATE(timestamp) = ?
+    AND description LIKE 'Cancellation of transaction ID %'
+    `).all(req.params.childId, today).map(row => row.cancelled_id);
+
+    // Get completed tasks, excluding cancelled ones
     const completedToday = db.prepare(`
         SELECT task_assignment_id, COUNT(*) as count
         FROM transaction_log
@@ -96,6 +109,8 @@ app.get('/api/assignments/:childId/completed-today', (req, res) => {
         AND action_type = 'task'
         AND DATE(timestamp) = ?
         AND task_assignment_id IS NOT NULL
+        AND amount > 0
+        ${cancelledIds.length > 0 ? `AND id NOT IN (${cancelledIds.join(',')})` : ''}
         GROUP BY task_assignment_id
         `).all(req.params.childId, today);
 
@@ -193,6 +208,27 @@ app.get('/api/transactions/pending', (req, res) => {
     res.json(transactions);
 });
 
+// Get pending transactions for a specific child (for undo functionality)
+app.get('/api/children/:childId/pending-tasks', (req, res) => {
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const pendingTasks = db.prepare(`
+    SELECT id, task_assignment_id
+    FROM transaction_log
+    WHERE child_id = ?
+    AND action_type = 'task'
+    AND DATE(timestamp) = ?
+    AND task_assignment_id IS NOT NULL
+    AND is_reviewed = 0
+ `).all(req.params.childId, today);
+
+    const pendingMap = {};
+    pendingTasks.forEach(row => {
+        pendingMap[row.task_assignment_id] = row.id; // Map assignment ID to transaction
+    });
+
+    res.json(pendingMap);
+});
+
 app.post('/api/transactions', (req, res) => {
     const { child_id, action_type, amount, description, task_assignment_id } = req.body;
 
@@ -255,6 +291,45 @@ app.patch('/api/transactions/:id/review', (req, res) => {
     res.json({ success: true, message: 'Transaction reviewed successfully' });
 });
 
+// Undo unreviewed transaction (for child dashboard)
+// IMPORTANT: This must come BEFORE the DELETE route to avoid route matching issues
+app.post('/api/transactions/:id/undo', (req, res) => {
+    const transactionId = req.params.id;
+    const transaction = db.transaction(() => {
+        
+        // Get transaction details before deleting
+        const trans = db.prepare('SELECT * FROM transaction_log WHERE id = ?').get(transactionId);
+
+        if (!trans) {
+            throw new Error('Transaction not found');
+        }
+
+        // Only allow undo of unreviewed transactions
+        if (trans.is_reviewed) {
+            throw new Error('Cannot undo reviewed transactions');
+        }
+        
+        // Reverse the transaction amount from the child's balance
+        db.prepare('UPDATE children SET balance = balance - ? WHERE id = ?').run(trans.amount, trans.child_id);
+        
+        // Delete the transaction
+        db.prepare('DELETE FROM transaction_log WHERE id = ?').run(transactionId);
+        
+        // Get updated child data
+        const child = db.prepare('SELECT * FROM children WHERE id = ?').get(trans.child_id);
+
+        return { transactionId, child };
+    });
+
+    try {
+        const result = transaction();
+        io.emit('transactionAdded', { child: result.child, transaction: null });
+        res.json({ success: true, message: 'Transaction undone successfully' });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
 app.delete('/api/transactions/:id', (req, res) => {
     const transactionId = req.params.id;
     const transaction = db.transaction(() => {
@@ -280,13 +355,115 @@ app.delete('/api/transactions/:id', (req, res) => {
         // Get updated child data
         const child = db.prepare('SELECT * FROM children WHERE id = ?').get(trans.child_id);
 
-        return {transactionId, child};
+        return { transactionId, child };
     });
 
     try {
         const result = transaction();
         io.emit('transactionDeleted', result);
         res.json({ success: true, message: 'Transaction deleted successfully' });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+// Export all data
+app.get('/api/export', (req, res) => {
+    try {
+        const data = {
+            version: '1.0',
+            exportDate: new Date().toISOString(),
+            data: {
+                children: db.prepare('SELECT * FROM children').all(),
+                tasks: db.prepare('SELECT * FROM task_catalog').all(),
+                rewards: db.prepare('SELECT * FROM rewards').all(),
+                assignments: db.prepare('SELECT * FROM task_assignments').all(),
+                transactions: db.prepare('SELECT * FROM transaction_log').all()
+            }
+        };
+
+        const filename = `points-backup-${new Date().toISOString().split('T')[0]}.json`;
+        res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+        res.setHeader('Content-Type', 'application/json');
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Import all data
+app.post('/api/import', (req, res) => {
+    try {
+        const { data } = req.body;
+
+        // Validate version
+        if (!data || data.version !== '1.0') {
+            return res.status(400).json({ error: 'Incompatible backup version' });
+        }
+
+        // Use transaction for atomic operation
+        const importData = db.transaction(() => {
+            // Clear existing data in correct order (due to foreign keys)
+            db.prepare('DELETE FROM transaction_log').run();
+            db.prepare('DELETE FROM task_assignments').run();
+            db.prepare('DELETE FROM children').run();
+            db.prepare('DELETE FROM task_catalog').run();
+            db.prepare('DELETE FROM rewards').run();
+
+            // Reset auto-increment counters
+            db.prepare('DELETE FROM sqlite_sequence').run();
+
+            // Import children
+            const insertChild = db.prepare(
+                'INSERT INTO children (id, name, image, balance, created_at) VALUES (?, ?, ?, ?, ?)'
+            );
+            data.data.children.forEach(child => {
+                insertChild.run(child.id, child.name, child.image, child.balance, child.created_at);
+            });
+
+            // Import tasks
+            const insertTask = db.prepare(
+                'INSERT INTO task_catalog (id, name, category, icon, completion_type, created_at) VALUES (?, ?, ?, ?, ?, ?)'
+            );
+            data.data.tasks.forEach(task => {
+                insertTask.run(task.id, task.name, task.category, task.icon, task.completion_type, task.created_at);
+            });
+
+            // Import rewards
+            const insertReward = db.prepare(
+                'INSERT INTO rewards (id, name, cost, image, created_at) VALUES (?, ?, ?, ?, ?)'
+            );
+            data.data.rewards.forEach(reward => {
+                insertReward.run(reward.id, reward.name, reward.cost, reward.image, reward.created_at);
+            });
+
+            // Import assignments
+            const insertAssignment = db.prepare(
+                'INSERT INTO task_assignments (id, child_id, task_id, points) VALUES (?, ?, ?, ?)'
+            );
+            data.data.assignments.forEach(assignment => {
+                insertAssignment.run(assignment.id, assignment.child_id, assignment.task_id, assignment.points);
+            });
+
+            // Import transactions
+            const insertTransaction = db.prepare(
+                'INSERT INTO transaction_log (id, child_id, task_assignment_id, action_type, amount, description, is_reviewed, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+            );
+            data.data.transactions.forEach(trans => {
+                insertTransaction.run(
+                    trans.id, trans.child_id, trans.task_assignment_id,
+                    trans.action_type, trans.amount, trans.description,
+                    trans.is_reviewed, trans.timestamp
+                );
+            });
+        });
+
+        importData();
+
+        // Notify all clients to reload
+        io.emit('dataImported');
+
+        res.json({ success: true, message: 'Data imported successfully' });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
