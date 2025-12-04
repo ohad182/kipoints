@@ -5,9 +5,9 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import { useLanguage } from './contexts/LanguageContext';
 import Toolbar from './components/Toolbar';
-import ChildrenView from './pages/ChildrenView';
-import ChildDashboard from './pages/ChildDashboard';
-import ParentDashboard from './pages/ParentDashboard';
+import ChildrenView from './pages/childrenView/ChildrenView';
+import ChildDashboard from './pages/childDashboard/ChildDashboard';
+import ParentDashboard from './pages/parentDashboard/ParentDashboard';
 import './App.css';
 
 function AppContent() {
@@ -18,7 +18,7 @@ function AppContent() {
     }, [t]);
 
     return (
-        <BrowserRouter>
+        <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
             <div className="app">
                 <Toolbar />
                 <Routes>

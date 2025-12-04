@@ -1,0 +1,325 @@
+/* Dashboard Overview Styles */
+.dashboard-overview {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    transition: transform 0.2s;
+    animation: slideUp 0.3s ease-out;
+}
+
+.stat-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.stat-card:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.stat-card:nth-child(4) {
+    animation-delay: 0.3s;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.dashboard-section {
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 15px;
+    padding: 1.5rem;
+}
+
+.dashboard-section h3 {
+    color: #667eea;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.children-overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.5rem;
+}
+
+.child-overview-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+}
+
+.child-overview-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.child-overview-card:hover .item-actions {
+    opacity: 1;
+}
+
+.item-actions {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    display: flex;
+    gap: 0.25rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.item-action-btn {
+    background: white;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.item-action-btn.edit:hover {
+    background: #2196F3;
+    color: white;
+}
+
+.item-action-btn.delete:hover {
+    background: #f44336;
+    color: white;
+}
+
+.child-overview-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.child-overview-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.child-overview-icon .child-emoji {
+    font-size: 3rem;
+}
+
+.child-overview-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.child-overview-balance {
+    font-size: 1.5rem;
+    color: #667eea;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.child-overview-tasks {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.quick-action-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.quick-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.quick-action-btn.assign-task {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+}
+
+.quick-action-btn.give-bonus {
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+}
+
+.quick-action-btn.apply-penalty {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+}
+
+.quick-action-btn.adjust-points {
+    background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+}
+
+.recent-activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.recent-activity-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: auto 1fr 2fr auto;
+    gap: 1rem;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s;
+}
+
+.recent-activity-item:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.activity-icon {
+    font-size: 1.5rem;
+}
+
+.activity-child {
+    font-weight: bold;
+    color: #333;
+}
+
+.activity-description {
+    color: #666;
+}
+
+.activity-points {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.activity-points.positive {
+    color: #4CAF50;
+}
+
+.activity-points.negative {
+    color: #f44336;
+}
+
+@media (max-width: 768px) {
+    .stats-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+    }
+
+    .children-overview-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .child-overview-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .recent-activity-item {
+        grid-template-columns: auto 1fr;
+        gap: 0.5rem;
+    }
+
+    .activity-child {
+        grid-column: 1 / -1;
+    }
+
+    .activity-description {
+        grid-column: 1 / -1;
+    }
+
+    .activity-points {
+        grid-column: 1 / -1;
+        text-align: left;
+    }
+}

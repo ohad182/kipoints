@@ -9,7 +9,7 @@ export function useEscapeKey(isOpen, onClose) {
     useEffect(() => {
         const handleEsc = (e) => {
             if (e.key === 'Escape' && isOpen) {
-                onclose();
+                onClose();
             }
         };
         

@@ -10,6 +10,8 @@
     "parent": {
         "dashboard": "Parent Dashboard",
         "tabs": {
+            "dashboard": "Dashboard",
+            "setup": "Setup",
             "review": "Review",
             "children": "Children",
             "tasks": "Tasks",
@@ -17,6 +19,26 @@
             "rewards": "Rewards",
             "history": "History",
             "backup": "Backup"
+        },
+        "childrenOverview": "👥 Children Overview",
+        "quickActions": "⚡ Quick Actions",
+        "recentActivity": "📈 Recent Activity",
+        "stats": {
+            "children": "Children",
+            "tasks": "Tasks",
+            "pending": "Pending",
+            "rewards": "Rewards",
+            "activeTasks": "tasks"
+        },
+        "quickAction": {
+            "assignTask": "Assign Task",
+            "addChild": "Add Child",
+            "applyPenalty": "Apply Penalty",
+            "adjustPoints": "Adjust Points"
+        },
+        "setup": {
+            "taskLibrary": "Task Library",
+            "assignedTo": "Assigned to"
         },
         "addChild": "+ Add Child",
         "addTask": "+ Add Task",
@@ -27,6 +49,15 @@
         "addReward": "+ Add Reward",
         "addPenalty": "➖ Add Penalty",
         "deleteTransaction": "Delete Transaction",
+        "pointsAdjustment": {
+            "title": "Adjust Points",
+            "points": "Points Amount",
+            "pointsPlaceholder": "Enter amount (positive or negative)",
+            "pointsHint": "Use positive numbers to add points, negative to subtract",
+            "description": "Description (optional)",
+            "descriptionPlaceholder": "e.g., 'Past month activities'",
+            "defaultDescription": "Manual points adjustment"
+        },
         "emptyPending": "No pending tasks to review",
         "emptyChildren": "No children yet",
         "emptyTasks": "No tasks yet",
@@ -35,6 +66,8 @@
         "emptyRewards": "No rewards yet",
         "approve": "✓ Approve",
         "reject": "✗ Reject",
+        "approveAll": "✓ Approve All",
+        "rejectAll": "✗ Reject All",
         "points": "points",
         "filterAll": "All Children"
     },
@@ -59,13 +92,16 @@
         "noTasks": "No tasks in this category",
         "noRewards": "No rewards available",
         "need": "Need",
-        "more": "more"
+        "more": "more",
+        "undo": "Undo",
+        "taskUndone": "Task completion cancelled",
+        "error": "An error occurred. Please try again."
     },
     "categories": {
-        "morning": "🌅 Morning",
-        "afternoon": "☀️ Afternoon",
-        "evening": "🌙 Evening",
-        "other": "📌 Other"
+        "morning": "Morning",
+        "afternoon": "Afternoon",
+        "evening": "Evening",
+        "other": "Other"
     },
     "modal": {
         "addChild": "Add New Child",
@@ -84,6 +120,7 @@
         "category": "Category",
         "points": "Points",
         "icon": "Select Icon:",
+        "image": "Select Image:",
         "completionType": "Completion Type",
         "completionOnce": "🔒 Once Per Day",
         "completionMultiple": "🔄 Multiple Times",
@@ -131,8 +168,10 @@
         "rewardDeleted": "Reward deleted successfully",
         "assignmentDeleted": "Assignment deleted successfully",
         "pointsUpdated": "Points updated successfully",
+        "pointsAdjusted": "Points adjusted successfully!",
         "transactionDeleted": "Transaction deleted successfully",
-        "transactionDeleteError": "Cannot delete unreviewed transactions"
+        "transactionDeleteError": "Cannot delete unreviewed transactions",
+        "error": "An error occurred"
     },
     "backup": {
         "export": "Export Data",
