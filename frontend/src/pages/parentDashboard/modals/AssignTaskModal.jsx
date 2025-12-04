@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useEscapeKey } from '../hooks/useEscapeKey';
+import { useLanguage } from '../../../contexts/LanguageContext';
+import { useEscapeKey } from '../../../hooks/useEscapeKey';
 import './Modal.css';
 
 function AssignTaskModal({ isOpen, onClose, onSubmit, onBulkSubmit, children, tasks, selectedTasks = [], allAssignments = [], preselectedTaskId = null }) {

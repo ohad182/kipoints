@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
-import { getTaskIconArray, ACTION_ICONS } from '../config/icons';
-import { useEscapeKey } from '../hooks/useEscapeKey';
+import { useLanguage } from '../../../contexts/LanguageContext';
+import { getTaskIconArray, ACTION_ICONS } from '../../../config/icons';
+import { useEscapeKey } from '../../../hooks/useEscapeKey';
 import './Modal.css';
 
 function AddTaskModal({ isOpen, onClose, onSubmit, editData }) {
@@ -91,9 +91,9 @@ function AddTaskModal({ isOpen, onClose, onSubmit, editData }) {
                     <div className="form-group">
                         <label>{t('modal.icon')}</label>
                         <div className="icon-selector">
-                            {getTaskIconArray().map(iconOption => (
+                            {getTaskIconArray().map((iconOption, index) => (
                                 <button
-                                    key={iconOption}
+                                    key={`task-icon-${index}`}
                                     type="button"
                                     className={`icon-option ${icon === iconOption ? 'selected' : ''}`}
                                     onClick={() => setIcon(iconOption)}

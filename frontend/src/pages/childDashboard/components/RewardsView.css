@@ -1,0 +1,133 @@
+/* Rewards View Styles */
+.rewards-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.rewards-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+.rewards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
+    max-height: 100%;
+}
+
+.reward-card {
+    background: white;
+    border: none;
+    border-radius: 20px;
+    padding: 2rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.reward-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+}
+
+.reward-card:hover:not(.disabled) {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 15px 35px rgba(245, 87, 108, 0.4);
+}
+
+.reward-card.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.reward-card.disabled::before {
+    background: #ccc;
+}
+
+.reward-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.reward-image-large {
+    font-size: 5rem;
+    margin-bottom: 0.5rem;
+}
+
+.reward-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    min-height: 2.4rem;
+    display: flex;
+    align-items: center;
+}
+
+.reward-cost {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #667eea;
+    padding: 0.4rem 1rem;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 12px;
+}
+
+.reward-cost.too-expensive {
+    color: #f5576c;
+    background: rgba(245, 87, 108, 0.1);
+}
+
+.need-more {
+    font-size: 0.9rem;
+    color: #f5576c;
+    font-weight: 600;
+}
+
+/* Scrollbar styling */
+.rewards-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.rewards-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.rewards-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 10px;
+}
+
+.rewards-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .rewards-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 1rem;
+    }
+
+    .reward-image-large {
+        font-size: 2.5rem;
+    }
+
+    .reward-name {
+        font-size: 0.9rem;
+    }
+}

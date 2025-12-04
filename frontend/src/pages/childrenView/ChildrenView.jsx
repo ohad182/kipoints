@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '../api';
-import { useSocket } from '../SocketContext';
-import { useLanguage } from '../contexts/LanguageContext';
+import { api } from '../../api';
+import { useSocket } from '../../SocketContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import './ChildrenView.css';
 
 function ChildrenView() {

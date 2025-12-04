@@ -1,0 +1,259 @@
+/* Parent Dashboard Modal Styles */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.modal-header h2 {
+    color: #333;
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: bold;
+    color: #333;
+    font-size: 1.1rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 0.75rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.form-group select option:disabled {
+    color: #999;
+    font-style: italic;
+}
+
+/* Image Upload - for AddChildModal */
+.image-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem;
+    border: 2px dashed #e0e0e0;
+    border-radius: 10px;
+    background: #f9f9f9;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.image-upload:hover {
+    border-color: #667eea;
+    background: #f5f5ff;
+}
+
+.image-preview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #667eea;
+}
+
+.upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: #999;
+}
+
+.upload-placeholder .icon {
+    font-size: 3rem;
+}
+
+.upload-placeholder p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Icon Selector - for AddTaskModal and AddRewardModal */
+.icon-selector {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+}
+
+.icon-option {
+    background: #f5f5f5;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.icon-option:hover {
+    background: #e8e8ff;
+    border-color: #667eea;
+}
+
+.icon-option.selected {
+    background: #667eea;
+    border-color: #667eea;
+    transform: scale(1.1);
+}
+
+/* Selected Tasks List - for AssignTaskModal */
+.selected-tasks-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 0.5rem;
+    background: #f9f9f9;
+}
+
+.selected-task-item {
+    padding: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.selected-task-item:last-child {
+    margin-bottom: 0;
+}
+
+.selected-task-item span {
+    font-size: 1rem;
+    color: #333;
+}
+
+/* Modal Action Buttons */
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.modal-button {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-button.primary {
+    background: #667eea;
+    color: white;
+}
+
+.modal-button.primary:hover {
+    background: #5568d3;
+}
+
+.modal-button.primary:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.modal-button.secondary {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.modal-button.secondary:hover {
+    background: #e0e0e0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .modal {
+        padding: 1.5rem;
+    }
+
+    .modal-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .icon-selector {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}

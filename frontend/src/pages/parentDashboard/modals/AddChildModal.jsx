@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
-import { getChildIconArray, ACTION_ICONS, CHILD_ICONS } from '../config/icons';
-import { useEscapeKey } from '../hooks/useEscapeKey';
+import { useLanguage } from '../../../contexts/LanguageContext';
+import { getChildIconArray, ACTION_ICONS, CHILD_ICONS } from '../../../config/icons';
+import { useEscapeKey } from '../../../hooks/useEscapeKey';
 import './Modal.css';
 
 function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
@@ -87,14 +87,14 @@ function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
                     </div>
 
                     <div className="form-group">
-                        <label>{t('modal.icon')}</label>    
+                        <label>{t('modal.image')}</label>
                         <div className="icon-selector">
-                            {getChildIconArray().map(iconOption => (
+                            {getChildIconArray().map((iconOption, index) => (
                                 <button
-                                  key={iconOption}
-                                  type="button"
-                                  className={`icon-option ${selectedIcon === iconOption ? 'selected' : ''}`}
-                                  onClick={() => handleIconSelect(iconOption)}
+                                    key={`child-icon-${index}`}
+                                    type="button"
+                                    className={`icon-option ${image === iconOption ? 'selected' : ''}`}
+                                    onClick={() => setImage(iconOption)}
                                 >
                                     {iconOption}
                                 </button>
@@ -112,14 +112,14 @@ function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
                             id="child-image-upload"
                         />
                         <label htmlFor="child-image-upload" className="image-upload">
-                        {imagePreview ? (
-                            <img src={imagePreview} alt="preview" className="image-preview" />
-                        ) : (
-                            <div className="upload-placeholder">
-                                <span className="icon">{ACTION_ICONS.camera}</span>
-                                <p>{t('modal.uploadImage')}</p>
-                            </div>
-                        )}
+                            {imagePreview ? (
+                                <img src={imagePreview} alt="preview" className="image-preview" />
+                            ) : (
+                                <div className="upload-placeholder">
+                                    <span className="icon">{ACTION_ICONS.camera}</span>
+                                    <p>{t('modal.uploadImage')}</p>
+                                </div>
+                            )}
                         </label>
                     </div>
 

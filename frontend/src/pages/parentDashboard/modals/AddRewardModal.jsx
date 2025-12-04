@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
-import { getRewardIconArray, ACTION_ICONS } from '../config/icons';
-import { useEscapeKey } from '../hooks/useEscapeKey';
+import { useLanguage } from '../../../contexts/LanguageContext';
+import { getRewardIconArray, ACTION_ICONS } from '../../../config/icons';
+import { useEscapeKey } from '../../../hooks/useEscapeKey';
 import './Modal.css';
 
 function AddRewardModal({ isOpen, onClose, onSubmit, editData }) {
@@ -71,11 +71,11 @@ function AddRewardModal({ isOpen, onClose, onSubmit, editData }) {
                     </div>
 
                     <div className="form-group">
-                        <label>{t('modal.icon')}</label>
+                        <label>{t('modal.image')}</label>
                         <div className="icon-selector">
-                            {getRewardIconArray().map(iconOption => (
+                            {getRewardIconArray().map((iconOption, index) => (
                                 <button
-                                    key={iconOption}
+                                    key={`reward-icon-${index}`}
                                     type="button"
                                     className={`icon-option ${image === iconOption ? 'selected' : ''}`}
                                     onClick={() => setImage(iconOption)}

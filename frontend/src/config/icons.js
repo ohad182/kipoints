@@ -1,7 +1,6 @@
 // Centralized icon configuration
 
 export const TASK_ICONS = {
-
     brushTeeth: '🦷',
     makeBed: '🛏️',
     cleanRoom: '🧹',
@@ -57,7 +56,6 @@ export const REWARD_ICONS = {
     artTime: '🖍️',
     swimming: '🏊',
     theater: '🎭',
-    circus: '🎪',
     specialReward: '🌟',
     premiumReward: '💎',
     achievement: '🏆',
@@ -91,6 +89,8 @@ export const ACTION_ICONS = {
     smile: '😊',
     download: '📥',
     upload: '📤',
+    add: '➕',
+    child: '👶'
 };
 
 export const CHILD_ICONS = {
@@ -128,7 +128,9 @@ export const CHILD_ICONS = {
     heart: '❤️',
     rainbow: '🌈',
     sun: '☀️',
-    moon: '🌙'
+    moon: '🌙',
+    user: '👤',
+    users: '👥'
 };
 
 // Helper to get icon arrays for selectors

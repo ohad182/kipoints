@@ -10,6 +10,8 @@
     "parent": {
         "dashboard": "לוח בקרה הורה",
         "tabs": {
+            "dashboard": "לוח בקרה",
+            "setup": "הגדרות",
             "review": "סקירה",
             "children": "ילדים",
             "tasks": "משימות",
@@ -17,6 +19,26 @@
             "rewards": "פרסים",
             "history": "היסטוריה",
             "backup": "גיבוי"
+        },
+        "childrenOverview": "סקירת ילדים 👥",
+        "quickActions": "פעולות מהירות ⚡",
+        "recentActivity": "פעילות אחרונה 📈",
+        "stats": {
+            "children": "ילדים",
+            "tasks": "משימות",
+            "pending": "ממתינות",
+            "rewards": "פרסים",
+            "activeTasks": "משימות"
+        },
+        "quickAction": {
+            "assignTask": "שיוך משימה",
+            "addChild": "הוסף ילד",
+            "applyPenalty": "הוסף קנס",
+            "adjustPoints": "התאם נקודות"
+        },
+        "setup": {
+            "taskLibrary": "ספריית משימות",
+            "assignedTo": "משויך ל"
         },
         "addChild": "הוסף ילד +",
         "addTask": "הוסף משימה +",
@@ -27,7 +49,16 @@
         "addReward": "הוסף פרס +",
         "addPenalty": "הוסף קנס ➖",
         "deleteTransaction": "מחק טרנזקציה",
-        "emptyPending": "אין משימות ממתינות לבדיקה",
+        "pointsAdjustment": {
+            "title": "התאמת נקודות",
+            "points": "כמות נקודות",
+            "pointsPlaceholder": "הזן כמות (חיובית או שלילית)",
+            "pointsHint": "השתמש במספרים חיוביים להוספה, שליליים להורדה",
+            "description": "תיאור (אופציונלי)",
+            "descriptionPlaceholder": "למשל, 'פעילות מהחודש שעבר'",
+            "defaultDescription": "התאמת נקודות ידנית"
+        },
+        "emptyPending": "אין משימות ממתינות לסקירה",
         "emptyChildren": "אין ילדים עדיין",
         "emptyTasks": "אין משימות עדיין",
         "emptyAssignments": "אין שיוכים עדיין",
@@ -63,7 +94,8 @@
         "need": "צריך עוד",
         "more": "נקודות",
         "undo": "ביטול",
-        "taskUndone": "ביטול השלמת משימה"
+        "taskUndone": "ביטול השלמת משימה",
+        "error": "אירעה שגיאה אנא נסה שוב."
     },
     "categories": {
         "morning": "בוקר",
@@ -88,6 +120,7 @@
         "category": "קטגוריה",
         "points": "נקודות",
         "icon": "בחר אייקון:",
+        "image": "בחר תמונה:",
         "completionType": "סוג השלמה",
         "completionOnce": "פעם אחת ביום 🔒",
         "completionMultiple": "מספר פעמים 🔁",
@@ -135,8 +168,10 @@
         "rewardDeleted": "הפרס נמחק בהצלחה",
         "assignmentDeleted": "השיוך נמחק בהצלחה",
         "pointsUpdated": "הנקודות עודכנו בהצלחה",
+        "pointsAdjusted": "הנקודות הותאמו בהצלחה!",
         "transactionDeleted": "הטרנזקציה נמחקה בהצלחה",
-        "transactionDeleteError": "לא ניתן למחוק טרנזקציות שלא נבדקו"
+        "transactionDeleteError": "לא ניתן למחוק טרנזקציות שלא נבדקו",
+        "error": "אירעה שגיאה"
     },
     "backup": {
         "export": "ייצוא נתונים",
