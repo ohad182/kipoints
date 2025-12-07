@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { SocketProvider } from './SocketContext';
 import { LanguageProvider } from './contexts/LanguageContext';
@@ -22,7 +22,7 @@ function AppContent() {
             <div className="app">
                 <Toolbar />
                 <Routes>
-                    <Route path="/" element={<Home />} />
+                    <Route path="/" element={<Navigate to="/child" replace />} />
                     <Route path="/child" element={<ChildrenView />} />
                     <Route path="/child/:id" element={<ChildDashboard />} />
                     <Route path="/parent" element={<ParentDashboard />} />
@@ -41,25 +41,6 @@ function App() {
                 </SocketProvider>
             </NotificationProvider>
         </LanguageProvider>
-    );
-}
-
-function Home() {
-    const { t } = useLanguage();
-    return (
-        <div className="home">
-            <h1>{t('app.title')}</h1>
-            <div className="home-buttons">
-                <Link to="/child" className="home-button child-button">
-                    <span className="icon">🎮</span>
-                    <span>{t('home.childButton')}</span>
-                </Link>
-                <Link to="/parent" className="home-button parent-button">
-                    <span className="icon">👨‍👩‍👧‍👦</span>
-                    <span>{t('home.parentButton')}</span>
-                </Link>
-            </div>
-        </div>
     );
 }
 

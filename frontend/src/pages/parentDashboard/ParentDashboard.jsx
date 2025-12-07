@@ -440,8 +440,6 @@ function ParentDashboard() {
 
     return (
         <div className="parent-dashboard">
-            <button className="back-button" onClick={() => navigate('/')}>{t('child.back')}</button>
-
             <h1>{t('parent.dashboard')}</h1>
 
             <div className="tabs">

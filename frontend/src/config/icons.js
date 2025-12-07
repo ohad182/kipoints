@@ -39,7 +39,10 @@ export const TASK_ICONS = {
     recycling: '♻️',
     specialTask: '✨',
     generalTask: '✔️',
-    study: '🧠'
+    study: '🧠',
+    poop: '💩',
+    table: '🍴'
+
 };
 
 export const REWARD_ICONS = {
@@ -99,7 +102,12 @@ export const ACTION_ICONS = {
     download: '📥',
     upload: '📤',
     add: '➕',
-    child: '👶'
+    child: '👶',
+    children: '👶',
+    family: '👨‍👩‍👧‍👦',
+    settings: '⚙️',
+    star: '⭐',
+    chevronDown: '▼'
 };
 
 export const CHILD_ICONS = {

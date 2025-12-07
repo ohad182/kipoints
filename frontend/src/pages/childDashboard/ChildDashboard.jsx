@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../../api';
 import { useSocket } from '../../SocketContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -13,11 +13,24 @@ import './ChildDashboard.css';
 
 function ChildDashboard() {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [child, setChild] = useState(null);
+    const [allChildren, setAllChildren] = useState([]);
     const [tasks, setTasks] = useState({ morning: [], afternoon: [], evening: [], other: [] });
     const [rewards, setRewards] = useState([]);
     const [completedToday, setCompletedToday] = useState({});
     const [pendingTasks, setPendingTasks] = useState({}); // Track pending (unreviewed) task transactions
+
+    // Apply theme to body element based on child gender
+    useEffect(() => {
+        if (child) {
+            const genderTheme = child.gender || 'not-set';
+            document.body.className = `child-theme-${genderTheme}`;
+        }
+        return () => {
+            document.body.className = '';
+        };
+    }, [child]);
 
     // Function to get category based on current time
     const getTimeBasedCategory = () => {
@@ -42,6 +55,7 @@ function ChildDashboard() {
 
     useEffect(() => {
         loadData();
+        loadAllChildren();
     }, [id]);
 
     useEffect(() => {
@@ -71,9 +85,59 @@ function ChildDashboard() {
             }
         });
 
+        socket.on('assignmentAdded', async (assignment) => {
+            if (assignment.child_id === parseInt(id)) {
+                // Reload task assignments
+                const assignments = await api.getAssignments(id);
+                const grouped = {
+                    morning: assignments.filter(a => a.category === 'morning'),
+                    afternoon: assignments.filter(a => a.category === 'afternoon'),
+                    evening: assignments.filter(a => a.category === 'evening'),
+                    other: assignments.filter(a => a.category === 'other')
+                };
+                setTasks(grouped);
+            }
+        });
+
+        socket.on('assignmentUpdated', async (assignment) => {
+            if (assignment.child_id === parseInt(id)) {
+                // Reload task assignments
+                const assignments = await api.getAssignments(id);
+                const grouped = {
+                    morning: assignments.filter(a => a.category === 'morning'),
+                    afternoon: assignments.filter(a => a.category === 'afternoon'),
+                    evening: assignments.filter(a => a.category === 'evening'),
+                    other: assignments.filter(a => a.category === 'other')
+                };
+                setTasks(grouped);
+            }
+        });
+
+        socket.on('assignmentDeleted', async (deletedId) => {
+            // Check if the deleted assignment was for this child by reloading
+            const assignments = await api.getAssignments(id);
+            const grouped = {
+                morning: assignments.filter(a => a.category === 'morning'),
+                afternoon: assignments.filter(a => a.category === 'afternoon'),
+                evening: assignments.filter(a => a.category === 'evening'),
+                other: assignments.filter(a => a.category === 'other')
+            };
+            setTasks(grouped);
+        });
+
+        socket.on('childUpdated', async (updatedChild) => {
+            if (updatedChild.id === parseInt(id)) {
+                setChild(updatedChild);
+            }
+        });
+
         return () => {
             socket.off('transactionAdded');
             socket.off('transactionReviewed');
+            socket.off('assignmentAdded');
+            socket.off('assignmentUpdated');
+            socket.off('assignmentDeleted');
+            socket.off('childUpdated');
         };
     }, [socket, id]);
 
@@ -98,6 +162,19 @@ function ChildDashboard() {
             other: assignments.filter(a => a.category === 'other')
         };
         setTasks(grouped);
+    };
+
+    const loadAllChildren = async () => {
+        try {
+            const childrenData = await api.getChildren();
+            setAllChildren(childrenData);
+        } catch (error) {
+            console.error('Failed to load children:', error);
+        }
+    };
+
+    const handleSwitchChild = (childId) => {
+        navigate(`/child/${childId}`);
     };
 
     const completeTask = async (task) => {
@@ -187,10 +264,16 @@ function ChildDashboard() {
 
     if (!child) return <div className="loading">{t('child.loading')}</div>;
 
+    const genderTheme = child.gender || 'not-set';
+
     return (
-        <div className="child-dashboard">
+        <div className={`child-dashboard child-dashboard-${genderTheme}`}>
             {/* Top Bar */}
-            <TopBar child={child} />
+            <TopBar
+                child={child}
+                allChildren={allChildren}
+                onSwitchChild={handleSwitchChild}
+            />
 
             {/* Main Content Area */}
             <div className="main-content">

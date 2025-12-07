@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useEscapeKey } from '../hooks/useEscapeKey';
+import LanguageSelector from './LanguageSelector';
 import './Modal.css';
 
 function SettingsModal({ isOpen, onClose }) {
@@ -36,6 +37,11 @@ function SettingsModal({ isOpen, onClose }) {
                 </div>
 
                 <form className="modal-form" onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label>{t('settings.language', { default: 'Language' })}</label>
+                        <LanguageSelector />
+                    </div>
+                    
                     <div className="form-group">
                         <label>{t('settings.backendUrl', { default: 'Backend Server URL' })}</label>
                         <input

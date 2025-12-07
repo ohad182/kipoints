@@ -1,27 +1,29 @@
 import { useState } from 'react';
-import LanguageSelector from './LanguageSelector';
-import SettingsModal from './SettingsModal';
+import SideNav from './SideNav';
 import { useLanguage } from '../contexts/LanguageContext';
 import './Toolbar.css';
 
 function Toolbar() {
     const { t } = useLanguage();
-    const [showSettings, setShowSettings] = useState(false);
+    const [sideNavOpen, setSideNavOpen] = useState(false);
 
-    return(
+    return (
         <>
-          <div className="toolbar">
-            <div className="toolbar-left">
-                <h1 className="toolbar-title">{t('appTitle')}</h1>
+            <div className="toolbar">
+                <div className="toolbar-left">
+                    <button
+                        className={`hamburger-button ${sideNavOpen ? 'open' : ''}`}
+                        onClick={() => setSideNavOpen(!sideNavOpen)}
+                        aria-label={sideNavOpen ? t('sidenav.close') : t('sidenav.open')}
+                    >
+                        <span className="hamburger-line"></span>
+                        <span className="hamburger-line"></span>
+                        <span className="hamburger-line"></span>
+                    </button>
+                    <h1 className="toolbar-title">{t('appTitle')}</h1>
+                </div>
             </div>
-            <div className="toolbar-right">
-                <LanguageSelector />
-                <button className="toolbar-button" onClick={() => setShowSettings(true)} title={t('settings.title')}>
-                    ⚙
-                </button>
-            </div>
-          </div>
-          <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
+            <SideNav isOpen={sideNavOpen} onClose={() => setSideNavOpen(false)} />
         </>
     );
 }

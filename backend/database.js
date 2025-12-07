@@ -13,6 +13,7 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     image TEXT,
+    gender TEXT CHECK(gender IN ('boy', 'girl', 'not-set')) DEFAULT 'not-set',
     balance INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );

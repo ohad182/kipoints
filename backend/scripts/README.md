@@ -4,6 +4,23 @@ This directory contains utility scripts for database maintenance and debugging.
 
 ## Scripts
 
+### `add-gender-column.js`
+**Purpose**: Migration script to add gender support to children.
+
+**Usage**:
+```bash
+node scripts/add-gender-column.js
+```
+
+**What it does**: 
+- Adds `gender` column to `children` table
+- Allows values: 'boy', 'girl', 'not-set'
+- Sets default to 'not-set' for all existing children
+
+**Status**: **Run this on production when deploying after gender feature**
+
+---
+
 ### `check-transactions.js`
 **Purpose**: Debug script to check today's transactions in the database.
 

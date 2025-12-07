@@ -2,22 +2,22 @@ import { useLanguage } from '../../../contexts/LanguageContext';
 import { CATEGORY_ICONS, ACTION_ICONS } from '../../../config/icons';
 import './TasksView.css';
 
-function TasksView({ 
-    tasks, 
-    activeCategory, 
-    onCategoryChange, 
-    completedToday, 
-    pendingTasks, 
-    onCompleteTask, 
-    onUndoTask 
+function TasksView({
+    tasks,
+    activeCategory,
+    onCategoryChange,
+    completedToday,
+    pendingTasks,
+    onCompleteTask,
+    onUndoTask
 }) {
     const { t } = useLanguage();
 
     const categories = [
-        { id: 'morning', icon: CATEGORY_ICONS.morning, label: t('categories.morning') },
-        { id: 'afternoon', icon: CATEGORY_ICONS.afternoon, label: t('categories.afternoon') },
-        { id: 'evening', icon: CATEGORY_ICONS.evening, label: t('categories.evening') },
-        { id: 'other', icon: CATEGORY_ICONS.other, label: t('categories.other') }
+        { id: 'morning', icon: CATEGORY_ICONS.morning, label: t('categories.morning'), time: '5:00 AM - 11:59 AM' },
+        { id: 'afternoon', icon: CATEGORY_ICONS.afternoon, label: t('categories.afternoon'), time: '12:00 PM - 5:59 PM' },
+        { id: 'evening', icon: CATEGORY_ICONS.evening, label: t('categories.evening'), time: '6:00 PM - 9:59 PM' },
+        { id: 'other', icon: CATEGORY_ICONS.other, label: t('categories.other'), time: t('categories.otherTime') }
     ];
 
     const currentTasks = tasks[activeCategory] || [];
@@ -31,6 +31,7 @@ function TasksView({
                         key={cat.id}
                         className={`category-tab ${activeCategory === cat.id ? 'active' : ''}`}
                         onClick={() => onCategoryChange(cat.id)}
+                        title={cat.time}
                     >
                         <span className="tab-icon">{cat.icon}</span>
                         <span className="tab-label">{cat.label}</span>
@@ -68,7 +69,7 @@ function TasksView({
                                         </div>
                                     </button>
                                     {canUndo && (
-                                        <button 
+                                        <button
                                             className="undo-button"
                                             onClick={() => onUndoTask(task)}
                                         >

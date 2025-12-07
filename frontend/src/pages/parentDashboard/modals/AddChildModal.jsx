@@ -10,23 +10,30 @@ function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
     const [image, setImage] = useState('');
     const [imagePreview, setImagePreview] = useState('');
     const [selectedIcon, setSelectedIcon] = useState(CHILD_ICONS.boy);
+    const [gender, setGender] = useState('not-set');
 
     useEscapeKey(isOpen, onClose);
 
     useEffect(() => {
         if (editData) {
             setName(editData.name || '');
-            setImage(editData.image || '');
-            setImagePreview(editData.image || '');
+            setGender(editData.gender || 'not-set');
             // If image starts with data: or http, it's an uploaded image, otherwise it's an icon
-            if (editData.image && !editData.image.startsWith('data:') && !editData.image.startsWith('http')) {
-                setSelectedIcon(editData.image);
+            if (editData.image && (editData.image.startsWith('data:') || editData.image.startsWith('http'))) {
+                setImagePreview(editData.image);
+                setSelectedIcon('');
+                setImage(editData.image);
+            } else {
+                setSelectedIcon(editData.image || CHILD_ICONS.boy);
+                setImage(editData.image || CHILD_ICONS.boy);
+                setImagePreview('');
             }
         } else {
             setName('');
             setImage('');
             setImagePreview('');
             setSelectedIcon(CHILD_ICONS.boy);
+            setGender('not-set');
         }
     }, [editData, isOpen]);
 
@@ -54,11 +61,12 @@ function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
         if (name.trim()) {
             // Use uploaded image if available, otherwise use selected icon
             const finalImage = imagePreview || selectedIcon;
-            onSubmit({ name, image: finalImage }, editData?.id);
+            onSubmit({ name, image: finalImage, gender }, editData?.id);
             setName('');
             setImage('');
             setImagePreview('');
             setSelectedIcon(CHILD_ICONS.boy);
+            setGender('not-set');
             onClose();
         }
     };
@@ -87,14 +95,23 @@ function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
                     </div>
 
                     <div className="form-group">
+                        <label>{t('modal.childGender')}</label>
+                        <select value={gender} onChange={(e) => setGender(e.target.value)}>
+                            <option value="not-set">{t('child.notSet')}</option>
+                            <option value="boy">{t('child.boy')}</option>
+                            <option value="girl">{t('child.girl')}</option>
+                        </select>
+                    </div>
+
+                    <div className="form-group">
                         <label>{t('modal.image')}</label>
                         <div className="icon-selector">
                             {getChildIconArray().map((iconOption, index) => (
                                 <button
                                     key={`child-icon-${index}`}
                                     type="button"
-                                    className={`icon-option ${image === iconOption ? 'selected' : ''}`}
-                                    onClick={() => setImage(iconOption)}
+                                    className={`icon-option ${selectedIcon === iconOption ? 'selected' : ''}`}
+                                    onClick={() => handleIconSelect(iconOption)}
                                 >
                                     {iconOption}
                                 </button>

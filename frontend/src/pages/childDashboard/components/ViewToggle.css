@@ -28,7 +28,7 @@
 
 .toggle-btn.active {
     background: white;
-    color: #667eea;
+    color: var(--accent-color, #667eea);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
     transform: scale(1.05);
 }

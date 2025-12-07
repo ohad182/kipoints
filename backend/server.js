@@ -26,16 +26,38 @@ app.get('/api/children', (req, res) => {
 });
 
 app.post('/api/children', (req, res) => {
-    const { name, image } = req.body;
-    const result = db.prepare('INSERT INTO children (name, image) VALUES (?, ?)').run(name, image);
+    const { name, image, gender = 'not-set' } = req.body;
+    const result = db.prepare('INSERT INTO children (name, image, gender) VALUES (?, ?, ?)').run(name, image, gender);
     const child = db.prepare('SELECT * FROM children WHERE id = ?').get(result.lastInsertRowid);
     io.emit('childAdded', child);
     res.status(201).json(child);
 });
 
 app.patch('/api/children/:id', (req, res) => {
-    const { name, image } = req.body;
-    db.prepare('UPDATE children SET name = ?, image = ? WHERE id = ?').run(name, image, req.params.id);
+    const { name, image, gender } = req.body;
+    const updates = [];
+    const values = [];
+
+    if (name !== undefined) {
+        updates.push('name = ?');
+        values.push(name);
+    }
+
+    if (image !== undefined) {
+        updates.push('image = ?');
+        values.push(image);
+    }
+
+    if (gender !== undefined) {
+        updates.push('gender = ?');
+        values.push(gender);
+    }
+
+    if (updates.length > 0) {
+        values.push(req.params.id);
+        db.prepare(`UPDATE children SET ${updates.join(', ')} WHERE id = ?`).run(...values);
+    }
+
     const child = db.prepare('SELECT * FROM children WHERE id = ?').get(req.params.id);
     io.emit('childUpdated', child);
     res.json(child);
@@ -296,7 +318,7 @@ app.patch('/api/transactions/:id/review', (req, res) => {
 app.post('/api/transactions/:id/undo', (req, res) => {
     const transactionId = req.params.id;
     const transaction = db.transaction(() => {
-        
+
         // Get transaction details before deleting
         const trans = db.prepare('SELECT * FROM transaction_log WHERE id = ?').get(transactionId);
 
@@ -308,13 +330,13 @@ app.post('/api/transactions/:id/undo', (req, res) => {
         if (trans.is_reviewed) {
             throw new Error('Cannot undo reviewed transactions');
         }
-        
+
         // Reverse the transaction amount from the child's balance
         db.prepare('UPDATE children SET balance = balance - ? WHERE id = ?').run(trans.amount, trans.child_id);
-        
+
         // Delete the transaction
         db.prepare('DELETE FROM transaction_log WHERE id = ?').run(transactionId);
-        
+
         // Get updated child data
         const child = db.prepare('SELECT * FROM children WHERE id = ?').get(trans.child_id);
 

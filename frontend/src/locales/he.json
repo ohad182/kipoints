@@ -1,5 +1,12 @@
 {
     "appTitle": "מערכת נקודות",
+    "sidenav": {
+        "children": "ילדים",
+        "parentDashboard": "לוח הורים",
+        "settings": "הגדרות",
+        "open": "פתח תפריט",
+        "close": "סגור תפריט"
+    },
     "app": {
         "title": "מערכת נקודות"
     },
@@ -86,6 +93,10 @@
         "confirmPurchase": "האם אתה בטוח שברצונך לרכוש את הפרס \"{name}\" ב-{cost} נקודות?",
         "purchasePrefix": "קנייה:",
         "done": "הושלם",
+        "gender": "מגדר",
+        "boy": "בן",
+        "girl": "בת",
+        "notSet": "לא נקבע",
         "alreadyCompleted": "המשימה כבר הושלמה היום!",
         "taskCompleted": "כל הכבוד! קיבלת +{points} נקודות!",
         "rewardPurchased": "הפרס '{name}' נרכש בהצלחה!",
@@ -101,7 +112,8 @@
         "morning": "בוקר",
         "afternoon": "צהריים",
         "evening": "ערב",
-        "other": "אחר"
+        "other": "אחר",
+        "otherTime": "בכל זמן"
     },
     "modal": {
         "addChild": "הוסף ילד חדש",
@@ -147,6 +159,7 @@
     },
     "settings": {
         "title": "הגדרות",
+        "language": "שפה",
         "backendUrl": "כתובת שרת Backend",
         "backendHelp": "הזן את כתובת שרת ה-Backend (לדוגמא: http://192.168.1.100:3000)",
         "reset": "איפוס לברירת מחדל",

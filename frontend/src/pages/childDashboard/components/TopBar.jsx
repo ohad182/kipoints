@@ -1,29 +1,34 @@
-import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../contexts/LanguageContext';
-import { ACTION_ICONS, CHILD_ICONS } from '../../../config/icons';
+import { ACTION_ICONS } from '../../../config/icons';
+import ChildAvatar from '../../../components/ChildAvatar';
 import './TopBar.css';
 
-function TopBar({ child }) {
-    const navigate = useNavigate();
+function TopBar({ child, allChildren, onSwitchChild }) {
     const { t } = useLanguage();
+
+    // Filter out the current child from the list
+    const otherChildren = allChildren?.filter(c => c.id !== child.id) || [];
 
     return (
         <div className="top-bar">
-            <button className="back-button" onClick={() => navigate('/child')}>
-                {t('child.back')}
-            </button>
-            <div className="child-info">
-                <div className="child-avatar-small">
-                    {child.image ? (
-                        child.image.startsWith('data:') || child.image.startsWith('http') ? (
-                            <img src={child.image} alt={child.name} />
-                        ) : (
-                            <span className="emoji-avatar">{child.image}</span>
-                        )
-                    ) : (
-                        <span className="default-avatar">{CHILD_ICONS.user}</span>
-                    )}
+            {otherChildren.length > 0 && (
+                <div className="other-children">
+                    {otherChildren.map(otherChild => (
+                        <ChildAvatar
+                            key={otherChild.id}
+                            child={otherChild}
+                            size="small"
+                            onClick={() => onSwitchChild(otherChild.id)}
+                        />
+                    ))}
                 </div>
+            )}
+            <div className="child-info">
+                <ChildAvatar 
+                    child={child} 
+                    size="medium"
+                    className="current-child-avatar"
+                />
                 <div className="child-name">{child.name}</div>
             </div>
             <div className="balance-chip">

@@ -4,6 +4,29 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    position: relative;
+}
+
+/* Gender-based theming with CSS custom properties */
+.child-dashboard-boy {
+    background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+    --accent-color: #4A90E2;
+    --accent-light: #64A8F5;
+    --accent-dark: #357ABD;
+}
+
+.child-dashboard-girl {
+    background: linear-gradient(135deg, #D88BA6 0%, #B97A94 100%);
+    --accent-color: #D88BA6;
+    --accent-light: #E5A4BB;
+    --accent-dark: #B97A94;
+}
+
+.child-dashboard-not-set {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --accent-color: #667eea;
+    --accent-light: #8b9aee;
+    --accent-dark: #764ba2;
 }
 
 .main-content {
@@ -11,7 +34,8 @@
     display: flex;
     flex-direction: column;
     padding: 1.5rem 2rem;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .loading {

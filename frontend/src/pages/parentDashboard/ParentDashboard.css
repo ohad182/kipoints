@@ -1,9 +1,9 @@
 /* Parent Dashboard Base Styles */
 .parent-dashboard {
-    min-height: calc(100vh - 60px);
+    height: calc(100vh - 60px);
     padding: 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .parent-dashboard h1 {

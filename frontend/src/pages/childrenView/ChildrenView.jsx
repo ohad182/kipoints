@@ -34,7 +34,6 @@ function ChildrenView() {
 
     return (
         <div className="children-view">
-            <button className="back-button" onClick={() => navigate('/')}>{t('child.back')}</button>
             <h1>{t('child.selectChild')}</h1>
             <div className="children-grid">
                 {children.map(child => (
@@ -43,7 +42,7 @@ function ChildrenView() {
                         className="child-card"
                         onClick={() => navigate(`/child/${child.id}`)}
                     >
-                        <div className="child-avatar">
+                        <div className="children-view-avatar">
                             {child.image ? (
                                 child.image.startsWith('data:') || child.image.startsWith('http') ? (
                                     <img src={child.image} alt={child.name} />

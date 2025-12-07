@@ -4,19 +4,40 @@
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     overflow-x: hidden;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
         sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     background-attachment: fixed;
+    font-size: 14px;
+}
+
+/* Gender based theme variables on body */
+body.child-theme-boy {
+    --accent-color: #4A90E2;
+    --accent-light: #64A8F5;
+    --accent-dark: #357ABD;
+}
+
+body.child-theme-girl {
+    --accent-color: #D88BA6;
+    --accent-light: #E5A4BB;
+    --accent-dark: #B97A94;
+}
+
+body.child-theme-not-set {
+    --accent-color: #667eea;
+    --accent-light: #8b9aee;
+    --accent-dark: #764ba2;
 }
 
 #root {
@@ -28,6 +49,33 @@ button {
     font-family: inherit;
 }
 
-input, textarea {
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Firefox scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+input,
+textarea {
     font-family: inherit;
 }
