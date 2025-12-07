@@ -7,6 +7,7 @@
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
     border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    gap: 1rem;
 }
 
 .back-button {
@@ -19,6 +20,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    flex-shrink: 0;
 }
 
 .back-button:hover {
@@ -31,11 +33,13 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    flex: 1;
+    justify-content: center;
 }
 
 .child-avatar-small {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     overflow: hidden;
     background: white;
@@ -44,6 +48,7 @@
     justify-content: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     flex-shrink: 0;
+    border: 3px solid #ffd700;
 }
 
 .child-avatar-small img {
@@ -53,11 +58,11 @@
 }
 
 .child-avatar-small .emoji-avatar {
-    font-size: 2rem;
+    font-size: 2.5rem;
 }
 
 .child-avatar-small .default-avatar {
-    font-size: 2rem;
+    font-size: 2.5rem;
 }
 
 .child-name {
@@ -76,6 +81,7 @@
     border-radius: 25px;
     box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
     animation: pulse 2s infinite;
+    flex-shrink: 0;
 }
 
 @keyframes pulse {
@@ -100,10 +106,65 @@
     color: #333;
 }
 
+/* Other Children Switcher */
+.other-children {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.other-child-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3 ease;
+    border: 2px solid transparent;
+    flex-shrink: 0;
+}
+
+.other-child-avatar:hover {
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    border-color: #ffd700;
+    background: white;
+}
+
+.other-child-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.other-child-avatar .emoji-avatar {
+    font-size: 1.8rem;
+}
+
+.other-child-avatar .default-avatar {
+    font-size: 1.8rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .top-bar {
         padding: 0.8rem 1rem;
+        flex-wrap: wrap;
+    }
+
+    .back-button {
+        order: -1;
+        width: 100%;
+        text-align: center;
+    }
+
+    .child-info {
+        order: 1;
+        justify-content: flex-start;
     }
 
     .child-name {
@@ -111,10 +172,23 @@
     }
 
     .balance-chip {
+        order: 2;
         padding: 0.5rem 1rem;
     }
 
     .balance-value {
         font-size: 1.4rem;
+    }
+
+    .other-children {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        margin: 0.5rem;
+    }
+
+    .other-child-avatar {
+        width: 40px;
+        height: 40px;
     }
 }
