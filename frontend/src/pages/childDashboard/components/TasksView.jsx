@@ -57,6 +57,7 @@ function TasksView({
                                         className={`task-card ${isCompleted ? 'completed' : ''}`}
                                         onClick={() => onCompleteTask(task)}
                                         disabled={isCompleted}
+                                        title={task.name}
                                     >
                                         <div className="task-card-content">
                                             <div className="task-icon-large">{task.icon || ACTION_ICONS.task}</div>
