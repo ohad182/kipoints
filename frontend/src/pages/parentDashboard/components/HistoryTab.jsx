@@ -18,7 +18,7 @@ function HistoryTab({ allTransactions, onDeleteTransaction }) {
                                 <div className="transaction-child">{transaction.child_name}</div>
                                 <div className="transaction-desc">{transaction.description}</div>
                                 <div className="transaction-date">
-                                    {new Date(transaction.timestamp).toLocaleDateString()}
+                                    {new Date(transaction.timestamp).toLocaleString()}
                                 </div>
                             </div>
                             <div 

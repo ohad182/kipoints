@@ -14,6 +14,19 @@ Backend server for the KiPoints application - a points management system for chi
 npm install
 ```
 
+## Database Migration
+
+**Important**: If you're upgrading from an older version, you need to run the migration script to add the gender column:
+
+```bash
+node scripts/add-gender-column.js
+```
+
+This migration:
+- Adds a `gender` column to the `children` table
+- Sets default value to 'not-set' for all existing children
+- Safe to run multiple times (checks if column already exists)
+
 ## Starting the Server
 
 To start the backend server on port 3000:

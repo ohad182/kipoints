@@ -17,7 +17,7 @@ node scripts/add-gender-column.js
 - Allows values: 'boy', 'girl', 'not-set'
 - Sets default to 'not-set' for all existing children
 
-**Status**: **Run this on production when deploying after gender feature**
+**Status**: ⚠ **Run this on production when deploying gender feature**
 
 ---
 

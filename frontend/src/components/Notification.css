@@ -1,7 +1,8 @@
 .notification {
     position: fixed;
-    top: 80px;
-    right: 20px;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
     min-width: 300px;
     max-width: 500px;
     padding: 1rem 1.5rem;
@@ -12,39 +13,18 @@
     justify-content: space-between;
     gap: 1rem;
     z-index: 2000;
-    animation: slideIn 0.3s ease-out;
+    animation: slideDown 0.3s ease-out;
     backdrop-filter: blur(10px);
 }
 
-[dir="rtl"] .notification {
-    right: auto;
-    left: 20px;
-}
-
-@keyframes slideIn {
+@keyframes slideDown {
     from {
-        transform: translateX(400px);
+        transform: translateX(-50%) translateY(-100px);
         opacity: 0;
     }
 
     to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-[dir="rtl"] .notification {
-    animation: slideInRTL 0.3s ease-out;
-}
-
-@keyframes slideInRTL {
-    from {
-        transform: translateX(-400px);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateX(0);
+        transform: translateX(-50%) translateY(0);
         opacity: 1;
     }
 }
@@ -119,9 +99,22 @@
 
 @media (max-width: 768px) {
     .notification {
-        right: 10px;
         left: 10px;
+        right: 10px;
+        transform: none;
         min-width: unset;
         max-width: unset;
+    }
+
+    @keyframes slideDown {
+        from {
+            transform: translateY(-100px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
     }
 }

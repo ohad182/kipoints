@@ -95,7 +95,7 @@ function AddChildModal({ isOpen, onClose, onSubmit, editData }) {
                     </div>
 
                     <div className="form-group">
-                        <label>{t('modal.childGender')}</label>
+                        <label>{t('child.gender')}</label>
                         <select value={gender} onChange={(e) => setGender(e.target.value)}>
                             <option value="not-set">{t('child.notSet')}</option>
                             <option value="boy">{t('child.boy')}</option>

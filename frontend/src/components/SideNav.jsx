@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
-import { ACTION_ICONS } from '../config/icons';
+import { ACTION_ICONS, CHILD_ICONS } from '../config/icons';
 import ChildAvatar from './ChildAvatar';
 import SettingsModal from './SettingsModal';
 import { api } from '../api';
@@ -44,6 +44,18 @@ function SideNav({ isOpen, onClose }) {
         return location.pathname.startsWith(path);
     };
 
+    const getActiveChildIcon = () => {
+        const match = location.pathname.match(/^\/child\/(\d+)/);
+        if (match) {
+            const childId = parseInt(match[1]);
+            const child = children.find(c => c.id === childId);
+            if (child?.gender === 'girl') {
+                return CHILD_ICONS.girl
+            }
+        }
+        return CHILD_ICONS.boy;
+    };
+
     return (
         <>
             {isOpen && <div className="sidenav-backdrop" onClick={onClose} />}
@@ -57,13 +69,13 @@ function SideNav({ isOpen, onClose }) {
 
                 <div className="sidenav-content">
                     <div className="sidenav-section">
-                        <button 
+                        <button
                             className={`sidenav-item ${isActive('/child') ? 'active' : ''}`}
                             onClick={() => handleNavigate('/child')}
                         >
-                            <span className="item-icon">{ACTION_ICONS.children}</span>
+                            <span className="item-icon">{getActiveChildIcon()}</span>
                             <span className="item-label">{t('sidenav.children')}</span>
-                            <span 
+                            <span
                                 className={`expand-icon ${childrenExpanded ? 'expanded' : ''}`}
                                 onClick={(e) => {
                                     e.stopPropagation();
@@ -93,14 +105,14 @@ function SideNav({ isOpen, onClose }) {
                     <div className="sidenav-divider"></div>
 
                     <div className="sidenav-section sidenav-footer">
-                        <button 
+                        <button
                             className={`sidenav-item ${isActive('/parent') ? 'active' : ''}`}
                             onClick={() => handleNavigate('/parent')}
                         >
                             <span className="item-icon">{ACTION_ICONS.family}</span>
                             <span className="item-label">{t('sidenav.parentDashboard')}</span>
                         </button>
-                        <button 
+                        <button
                             className="sidenav-item"
                             onClick={() => {
                                 setShowSettings(true);
