@@ -8,7 +8,8 @@ function AddTaskModal({ isOpen, onClose, onSubmit, editData }) {
     const { t } = useLanguage();
     const [name, setName] = useState('');
     const [category, setCategory] = useState('morning');
-    const [icon, setIcon] = useState(ACTION_ICONS.task);
+    const [image, setImage] = useState(ACTION_ICONS.task);
+    const [imagePreview, setImagePreview] = useState('');
     const [completionType, setCompletionType] = useState('once');
 
     useEscapeKey(isOpen, onClose);
@@ -17,12 +18,22 @@ function AddTaskModal({ isOpen, onClose, onSubmit, editData }) {
         if (editData) {
             setName(editData.name || '');
             setCategory(editData.category || 'morning');
-            setIcon(editData.icon || ACTION_ICONS.task);
             setCompletionType(editData.completion_type || 'once');
+            // Support both new 'image' and old 'icon' field for backwards compatibility
+            const taskImage = editData.image || editData.icon;
+            // If image starts with data: or http, it's an uploaded image, otherwise it's an emoji
+            if (taskImage && (taskImage.startsWith('data:') || taskImage.startsWith('http'))) {
+                setImagePreview(taskImage);
+                setImage('');
+            } else {
+                setImage(taskImage || ACTION_ICONS.task);
+                setImagePreview('');
+            }
         } else {
             setName('');
             setCategory('morning');
-            setIcon(ACTION_ICONS.task);
+            setImage(ACTION_ICONS.task);
+            setImagePreview('');
             setCompletionType('once');
         }
     }, [editData, isOpen]);
@@ -34,13 +45,33 @@ function AddTaskModal({ isOpen, onClose, onSubmit, editData }) {
         { value: 'other', label: t('categories.other') },//'⭐ אחרים' }
     ];
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+                setImage(''); // Clear image selection when file is uploaded
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleIconSelect = (imageOption) => {
+        setImage(imageOption);
+        setImagePreview(''); // Clear image preview when emoji is selected
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         if (name.trim()) {
-            onSubmit({ name, category, icon, completion_type: completionType }, editData?.id);
+            // Use uploaded image if available, otherwise use selected emoji
+            const finalImage = imagePreview || image;
+            onSubmit({ name, category, image: finalImage, completion_type: completionType }, editData?.id);
             setName('');
             setCategory('morning');
-            setIcon(ACTION_ICONS.task);
+            setImage(ACTION_ICONS.task);
+            setImagePreview('');
             setCompletionType('once');
             onClose();
         }
@@ -91,17 +122,38 @@ function AddTaskModal({ isOpen, onClose, onSubmit, editData }) {
                     <div className="form-group">
                         <label>{t('modal.icon')}</label>
                         <div className="icon-selector">
-                            {getTaskIconArray().map((iconOption, index) => (
+                            {getTaskIconArray().map((imageOption, index) => (
                                 <button
-                                    key={`task-icon-${index}`}
+                                    key={`task-image-${index}`}
                                     type="button"
-                                    className={`icon-option ${icon === iconOption ? 'selected' : ''}`}
-                                    onClick={() => setIcon(iconOption)}
+                                    className={`icon-option ${image === imageOption ? 'selected' : ''}`}
+                                    onClick={() => handleIconSelect(imageOption)}
                                 >
-                                    {iconOption}
+                                    {imageOption}
                                 </button>
                             ))}
                         </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label>{t('modal.orUploadImage')}</label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            style={{ display: 'none' }}
+                            id="task-image-upload"
+                        />
+                        <label htmlFor="task-image-upload" className="image-upload">
+                            {imagePreview ? (
+                                <img src={imagePreview} alt="preview" className="image-preview" />
+                            ) : (
+                                <div className="upload-placeholder">
+                                    <span className="icon">{ACTION_ICONS.camera}</span>
+                                    <p>{t('modal.uploadImage')}</p>
+                                </div>
+                            )}
+                        </label>
                     </div>
 
                     <div className="modal-actions">

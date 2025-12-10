@@ -115,6 +115,15 @@
         "other": "אחר",
         "otherTime": "בכל זמן"
     },
+    "dailySummary": {
+        "today": "היום",
+        "clickToSee": "לחץ לראות",
+        "title": "היום שלי",
+        "starsEarned": "נקודות שצברתי!",
+        "tasksDone": "משימות שסיימתי!",
+        "tasks": "משימות",
+        "noActivity": "מוכן לצבור כוכבים? בואו נתחיל! 🚀"
+    },
     "modal": {
         "addChild": "הוסף ילד חדש",
         "editChild": "ערוך ילד",
@@ -141,6 +150,7 @@
         "selectedTasks": "משימות נבחרות",
         "selectChild": "בחר ילד",
         "allChildren": "כל הילדים",
+        "selectChildPlaceholder": "בחר ילד",
         "alreadyAssigned": "כבר משויך",
         "selectTask": "בחר משימה",
         "assign": "שייך",
@@ -151,7 +161,7 @@
         "addPenalty": "הוסף קנס",
         "reason": "סיבה",
         "amount": "סכום",
-        "selectChildPlaceholder": "בחר ילד"
+        "close": "סגור"
     },
     "completionType": {
         "once": "פעם ביום 🔒",
@@ -163,7 +173,10 @@
         "backendUrl": "כתובת שרת Backend",
         "backendHelp": "הזן את כתובת שרת ה-Backend (לדוגמא: http://192.168.1.100:3000)",
         "reset": "איפוס לברירת מחדל",
-        "saved": "ההגדרות נשמרו! אנא רענן את הדף כדי שהשינויים ייכנסו לתוקף."
+        "saved": "ההגדרות נשמרו! אנא רענן את הדף כדי שהשינויים ייכנסו לתוקף.",
+        "dailySummaryMode": "תצוגת סיכום יומי",
+        "dailySummaryModePopup": "חלון קופץ 📱",
+        "dailySummaryModeDrawer": "מגירה תחתונה 📊"
     },
     "confirm": {
         "deleteChild": "האם אתה בטוח שברצונך למחוק ילד זה? כל הנתונים שלו יימחקו.",

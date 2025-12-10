@@ -1,5 +1,5 @@
 import { useLanguage } from '../../../contexts/LanguageContext';
-import { CATEGORY_ICONS, ACTION_ICONS } from '../../../config/icons';
+import { renderImage, CATEGORY_ICONS, ACTION_ICONS } from '../../../config/icons';
 import './TasksView.css';
 
 function TasksView({
@@ -60,7 +60,9 @@ function TasksView({
                                         title={task.name}
                                     >
                                         <div className="task-card-content">
-                                            <div className="task-icon-large">{task.icon || ACTION_ICONS.task}</div>
+                                            <div className="task-icon-large">
+                                                {renderImage(task.image, ACTION_ICONS.task, '3em')}
+                                            </div>
                                             <div className="task-name">{task.name}</div>
                                             {isCompleted ? (
                                                 <div className="completed-badge">{ACTION_ICONS.completed}</div>

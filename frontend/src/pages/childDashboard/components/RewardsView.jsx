@@ -1,5 +1,5 @@
 import { useLanguage } from '../../../contexts/LanguageContext';
-import { ACTION_ICONS } from '../../../config/icons';
+import { renderImage, ACTION_ICONS } from '../../../config/icons';
 import './RewardsView.css';
 
 function RewardsView({ rewards, childBalance, onBuyReward }) {
@@ -25,7 +25,9 @@ function RewardsView({ rewards, childBalance, onBuyReward }) {
                                     disabled={!canAfford}
                                 >
                                     <div className="reward-card-content">
-                                        <div className="reward-image-large">{reward.image || ACTION_ICONS.reward}</div>
+                                        <div className="reward-image-large">
+                                            {renderImage(reward.image, ACTION_ICONS.reward, '3em')}
+                                        </div>
                                         <div className="reward-name">{reward.name}</div>
                                         <div className={`reward-cost ${!canAfford ? 'too-expensive' : ''}`}>
                                             {reward.cost} {ACTION_ICONS.bonus}

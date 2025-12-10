@@ -1,0 +1,145 @@
+.category-section {
+    background: #f8f9fa;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.category-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.category-header:hover {
+    background: #f0f1f3;
+}
+
+.category-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.category-icon {
+    font-size: 1.5rem;
+}
+
+.category-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.category-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    color: #666;
+}
+
+.category-points {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.points-value {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--accent-color, #667eea);
+}
+
+.expand-arrow {
+    font-size: 0.75rem;
+    color: #999;
+    transition: transform 0.3s ease;
+}
+
+.expand-arrow.expanded {
+    transform: rotate(180deg);
+}
+
+.category-tasks {
+    padding: 0 1rem 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.task-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.task-icon {
+    font-size: 1.25rem;
+}
+
+.task-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.task-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.task-time {
+    font-size: 0.75rem;
+    color: #999;
+}
+
+.task-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.task-points {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #4CAF50;
+}
+
+.status-badge {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+}
+
+.status-badge.reviewed {
+    background: #4CAF50;
+    color: white;
+}
+
+.status-badge.pending {
+    background: #ff9800;
+    color: white;
+}
+
+/* RTL Support */
+[dir="rtl"] .category-info,
+[dir="rtl"] .task-info {
+    direction: rtl;
+}

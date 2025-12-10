@@ -9,6 +9,7 @@ function AddRewardModal({ isOpen, onClose, onSubmit, editData }) {
     const [name, setName] = useState('');
     const [cost, setCost] = useState('');
     const [image, setImage] = useState(ACTION_ICONS.reward);
+    const [imagePreview, setImagePreview] = useState('');
 
     useEscapeKey(isOpen, onClose);
 
@@ -16,21 +17,51 @@ function AddRewardModal({ isOpen, onClose, onSubmit, editData }) {
         if (editData) {
             setName(editData.name || '');
             setCost(editData.cost?.toString() || '');
-            setImage(editData.image || ACTION_ICONS.reward);
+            // Support both new 'image' field and old 'icon' field for backwards compatibility
+            const rewardImage = editData.image || editData.icon;
+            // If image starts with data: or http, it's an uploaded image, otherwise it's an emoji
+            if (rewardImage && (rewardImage.startsWith('data:') || rewardImage.startsWith('http'))) {
+                setImagePreview(rewardImage);
+                setImage('');
+            } else {
+                setImage(rewardImage || ACTION_ICONS.reward);
+                setImagePreview('');
+            }
         } else {
             setName('');
             setCost('');
             setImage(ACTION_ICONS.reward);
+            setImagePreview('');
         }
     }, [editData, isOpen]);
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+                setImage(''); // Clear image selection when file is uploaded
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleIconSelect = (imageOption) => {
+        setImage(imageOption);
+        setImagePreview(''); // Clear image preview when emoji is selected
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (name.trim() && cost > 0) {
-            onSubmit({ name, cost: parseInt(cost), image }, editData?.id);
+            // Use uploaded image if available, otherwise use selected emoji
+            const finalImage = imagePreview || image;
+            onSubmit({ name, cost: parseInt(cost), image: finalImage }, editData?.id);
             setName('');
             setCost('');
             setImage(ACTION_ICONS.reward);
+            setImagePreview('');
             onClose();
         }
     };
@@ -73,17 +104,38 @@ function AddRewardModal({ isOpen, onClose, onSubmit, editData }) {
                     <div className="form-group">
                         <label>{t('modal.image')}</label>
                         <div className="icon-selector">
-                            {getRewardIconArray().map((iconOption, index) => (
+                            {getRewardIconArray().map((imageOption, index) => (
                                 <button
-                                    key={`reward-icon-${index}`}
+                                    key={`reward-image-${index}`}
                                     type="button"
-                                    className={`icon-option ${image === iconOption ? 'selected' : ''}`}
-                                    onClick={() => setImage(iconOption)}
+                                    className={`icon-option ${image === imageOption ? 'selected' : ''}`}
+                                    onClick={() => handleIconSelect(imageOption)}
                                 >
-                                    {iconOption}
+                                    {imageOption}
                                 </button>
                             ))}
                         </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label>{t('modal.orUploadImage')}</label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            style={{ display: 'none' }}
+                            id="reward-image-upload"
+                        />
+                        <label htmlFor="reward-image-upload" className="image-upload">
+                            {imagePreview ? (
+                                <img src={imagePreview} alt="preview" className="image-preview" />
+                            ) : (
+                                <div className="upload-placeholder">
+                                    <span className="icon">{ACTION_ICONS.camera}</span>
+                                    <p>{t('modal.uploadImage')}</p>
+                                </div>
+                            )}
+                        </label>
                     </div>
 
                     <div className="modal-actions">

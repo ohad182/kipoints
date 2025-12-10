@@ -7,17 +7,21 @@ import './Modal.css';
 function SettingsModal({ isOpen, onClose }) {
     const { t } = useLanguage();
     const [backendUrl, setBackendUrl] = useState('');
+    const [dailySummaryMode, setDailySummaryMode] = useState('popup');
 
     useEscapeKey(isOpen, onClose);
 
     useEffect(() => {
         const savedUrl = localStorage.getItem('backendUrl') || 'http://localhost:3000';
+        const savedMode = localStorage.getItem('dailySummaryMode') || 'popup';
         setBackendUrl(savedUrl);
+        setDailySummaryMode(savedMode);
     }, [isOpen]);
-    
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        localStorage.setItem('backendUrl', backendurl);
+        localStorage.setItem('backendUrl', backendUrl);
+        localStorage.setItem('dailySummaryMode', dailySummaryMode);
         alert(t('settings.saved', { default: 'Settings saved! Please refresh the page for changes to take effect.' }));
         onClose();
     };
@@ -26,7 +30,7 @@ function SettingsModal({ isOpen, onClose }) {
         setBackendUrl('http://localhost:3000');
     };
 
-    if (!isOpen)  return null;
+    if (!isOpen) return null;
 
     return (
         <div className="modal-overlay" onClick={onClose}>
@@ -41,7 +45,33 @@ function SettingsModal({ isOpen, onClose }) {
                         <label>{t('settings.language', { default: 'Language' })}</label>
                         <LanguageSelector />
                     </div>
-                    
+
+                    <div className="form-group">
+                        <label>{t('settings.dailySummaryMode', { default: 'Daily Summary Display' })}</label>
+                        <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                                <input
+                                    type="radio"
+                                    name="dailySummaryMode"
+                                    value="popup"
+                                    checked={dailySummaryMode === 'popup'}
+                                    onChange={(e) => setDailySummaryMode(e.target.value)}
+                                />
+                                {t('settings.dailySummaryModePopup', { default: '📱 Modal Popup' })}
+                            </label>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                                <input
+                                    type="radio"
+                                    name="dailySummaryMode"
+                                    value="drawer"
+                                    checked={dailySummaryMode === 'drawer'}
+                                    onChange={(e) => setDailySummaryMode(e.target.value)}
+                                />
+                                {t('settings.dailySummaryModeDrawer', { default: '📊 Bottom Drawer' })}
+                            </label>
+                        </div>
+                    </div>
+
                     <div className="form-group">
                         <label>{t('settings.backendUrl', { default: 'Backend Server URL' })}</label>
                         <input

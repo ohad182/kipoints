@@ -1,0 +1,430 @@
+.daily-summary-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 100;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.daily-summary-bar:hover {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.daily-summary-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.daily-summary-text {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+}
+
+.daily-progress-bar {
+    flex: 1;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    overflow: hidden;
+    min-width: 100px;
+}
+
+.daily-progress-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 20px;
+    transition: width 0.5s ease;
+}
+
+.daily-summary-action {
+    font-size: 0.85rem;
+    color: #666;
+    white-space: nowrap;
+}
+
+/* RTL Support */
+[dir="rtl"] .daily-summary-content {
+    direction: rtl;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .daily-summary-bar {
+        padding: 0 0.75rem;
+    }
+
+    .daily-summary-text {
+        font-size: 0.85rem;
+    }
+
+    .daily-summary-action {
+        font-size: 0.75rem;
+    }
+}
+
+
+/* ===== DRAWER MODE ===== */
+.daily-summary-drawer {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    max-width: 900px;
+    background: white;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    transition: max-height 0.3s ease-out;
+    max-height: 60px;
+    overflow: hidden;
+}
+
+.daily-summary-drawer.open {
+    max-height: 80vh;
+}
+
+.drawer-handle {
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px 16px 0 0;
+    transition: background 0.2s;
+    padding: 0 1.5rem;
+}
+
+.drawer-handle:hover {
+    background: rgba(245, 245, 245, 1);
+}
+
+.handle-bar {
+    width: 40px;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+    margin-bottom: 8px;
+}
+
+.drawer-handle-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.drawer-title-text {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+}
+
+.drawer-progress-bar {
+    flex: 1;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    overflow: hidden;
+    min-width: 100px;
+}
+
+.drawer-progress-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 20px;
+    transition: width 0.5s ease;
+}
+
+.drawer-toggle-icon {
+    font-size: 1.2rem;
+    color: #666;
+    transition: transform 0.3s;
+    min-width: 20px;
+    text-align: center;
+}
+
+.daily-summary-drawer.open .drawer-toggle-icon {
+    transform: rotate(180deg);
+}
+
+.drawer-content {
+    padding: 1.5rem;
+    overflow-y: auto;
+    max-height: calc(80vh - 60px);
+}
+
+.drawer-date {
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+    color: #666;
+    text-align: center;
+}
+
+.drawer-summary-total {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.drawer-summary-total .summary-stat {
+    flex: 1;
+    background: linear-gradient(135deg, var(--accent-light, #f0f0f0) 0%, var(--accent-color, #e0e0e0) 100%);
+    padding: 1.25rem;
+    border-radius: 16px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.drawer-summary-total .summary-stat:hover {
+    transform: scale(1.05);
+}
+
+.drawer-summary-total .stat-icon {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.drawer-summary-total .stat-value {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: white;
+    line-height: 1;
+}
+
+.drawer-summary-total .stat-label {
+    display: block;
+    font-size: 1rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.drawer-categories {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.drawer-categories .no-activity {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.drawer-categories .no-activity p {
+    font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+    .daily-summary-drawer {
+        width: 95%;
+        left: 2.5%;
+        transform: none;
+    }
+
+    .drawer-summary-total {
+        flex-direction: column;
+    }
+
+    .drawer-title-text {
+        font-size: 0.85rem;
+    }
+}
+
+[dir="rtl"] .drawer-handle-content {
+    direction: rtl;
+}
+
+.daily-summary-drawer {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    max-width: 900px;
+    background: white;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    transition: max-height 0.3s ease-out;
+    /* Collapsed state - only handle visible */
+    max-height: 60px;
+    overflow: hidden;
+}
+
+.daily-summary-drawer.open {
+    max-height: 80vh;
+}
+
+/* Handle that's always visible */
+.drawer-handle {
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px 16px 0 0;
+    transition: background 0.2s;
+    padding: 0 1.5rem;
+}
+
+.drawer-handle:hover {
+    background: rgba(245, 245, 245, 1);
+}
+
+.handle-bar {
+    width: 40px;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+    margin-bottom: 8px;
+}
+
+.drawer-handle-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.drawer-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+}
+
+.drawer-toggle-icon {
+    font-size: 1.2rem;
+    color: #666;
+    transition: transform 0.3s;
+    min-width: 20px;
+    text-align: center;
+}
+
+.daily-summary-drawer.open .drawer-toggle-icon {
+    transform: rotate(180deg);
+}
+
+/* Content that slides up */
+.drawer-content {
+    padding: 1.5rem;
+    overflow-y: auto;
+    max-height: calc(80vh - 60px);
+}
+
+.drawer-date {
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+    color: #666;
+    text-align: center;
+}
+
+.drawer-summary-total {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.drawer-summary-total .summary-stat {
+    flex: 1;
+    background: linear-gradient(135deg, var(--accent-light, #f0f0f0) 0%, var(--accent-color, #e0e0e0) 100%);
+    padding: 1.25rem;
+    border-radius: 16px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.drawer-summary-total .summary-stat:hover {
+    transform: scale(1.05);
+}
+
+.drawer-summary-total .stat-icon {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.drawer-summary-total .stat-value {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: white;
+    line-height: 1;
+}
+
+.drawer-summary-total .stat-label {
+    display: block;
+    font-size: 1rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.drawer-categories {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.drawer-categories .no-activity {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.drawer-categories .no-activity p {
+    font-size: 1.1rem;
+}
+
+/* Mobile respons iveness */
+@media (max-width: 768px) {
+    .daily-summary-drawer {
+        width: 95%;
+        left: 2.5%;
+        transform: none;
+    }
+
+    .drawer-summary-total {
+        flex-direction: column;
+    }
+
+    .drawer-title {
+        font-size: 0.85rem;
+    }
+}
+
+/* RTL support */
+[dir="rtl"] .drawer-handle-content {
+    direction: rtl;
+}

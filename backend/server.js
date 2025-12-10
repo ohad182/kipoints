@@ -76,16 +76,16 @@ app.get('/api/tasks', (req, res) => {
 });
 
 app.post('/api/tasks', (req, res) => {
-    const { name, category, icon, completion_type = 'once' } = req.body;
-    const result = db.prepare('INSERT INTO task_catalog (name, category, icon, completion_type) VALUES (?, ?, ?, ?)').run(name, category, icon, completion_type);
+    const { name, category, image, completion_type = 'once' } = req.body;
+    const result = db.prepare('INSERT INTO task_catalog (name, category, image, completion_type) VALUES (?, ?, ?, ?)').run(name, category, image, completion_type);
     const task = db.prepare('SELECT * FROM task_catalog WHERE id = ?').get(result.lastInsertRowid);
     io.emit('taskAdded', task);
     res.status(201).json(task);
 });
 
 app.patch('/api/tasks/:id', (req, res) => {
-    const { name, category, icon, completion_type } = req.body;
-    db.prepare('UPDATE task_catalog SET name = ?, category = ?, icon = ?, completion_type = ? WHERE id = ?').run(name, category, icon, completion_type, req.params.id);
+    const { name, category, image, completion_type } = req.body;
+    db.prepare('UPDATE task_catalog SET name = ?, category = ?, image = ?, completion_type = ? WHERE id = ?').run(name, category, image, completion_type, req.params.id);
     const task = db.prepare('SELECT * FROM task_catalog WHERE id = ?').get(req.params.id);
     io.emit('taskUpdated', task);
     res.json(task);
@@ -100,7 +100,7 @@ app.delete('/api/tasks/:id', (req, res) => {
 // ===== TASK ASSIGNMENTS ROUTES =====
 app.get('/api/assignments/:childId', (req, res) => {
     const assignments = db.prepare(`
-        SELECT ta.*, tc.name, tc.category, tc.icon, tc.completion_type
+        SELECT ta.*, tc.name, tc.category, tc.image, tc.completion_type
         FROM task_assignments ta
         JOIN task_catalog tc ON ta.task_id = tc.id
         WHERE ta.child_id = ?
@@ -149,7 +149,7 @@ app.post('/api/assignments', (req, res) => {
     try {
         const result = db.prepare('INSERT INTO task_assignments (child_id, task_id, points) VALUES (?, ?, ?)').run(child_id, task_id, points);
         const assignment = db.prepare(`
-        SELECT ta.*, tc.name, tc.category, tc.icon, tc.completion_type
+        SELECT ta.*, tc.name, tc.category, tc.image, tc.completion_type
         FROM task_assignments ta
         JOIN task_catalog tc ON ta.task_id = tc.id
         WHERE ta.id = ?
@@ -165,7 +165,7 @@ app.patch('/api/assignments/:id', (req, res) => {
     const { points } = req.body;
     db.prepare('UPDATE task_assignments SET points = ? WHERE id = ?').run(points, req.params.id);
     const assignment = db.prepare(`
-        SELECT ta.*, tc.name, tc.category, tc.icon, tc.completion_type
+        SELECT ta.*, tc.name, tc.category, tc.image, tc.completion_type
         FROM task_assignments ta
         JOIN task_catalog tc ON ta.task_id = tc.id
         WHERE ta.id = ?
@@ -249,6 +249,79 @@ app.get('/api/children/:childId/pending-tasks', (req, res) => {
     });
 
     res.json(pendingMap);
+});
+
+// Get daily summary for a child
+app.get('/api/children/:childId/daily-summary', (req, res) => {
+    const today = new Date().toISOString().split('T')[0];
+
+    const transactions = db.prepare(`
+        SELECT 
+            tl.id as transaction_id,
+            tl.task_assignment_id,
+            tl.amount as points,
+            tl.timestamp as completed_at,
+            tl.is_reviewed,
+            tc.name as task_name,
+            tc.image as task_image,
+            tc.category as task_category
+        FROM transaction_log tl
+        INNER JOIN task_assignments ta ON tl.task_assignment_id = ta.id
+        INNER JOIN task_catalog tc ON ta.task_id = tc.id
+        WHERE tl.child_id = ?
+          AND tl.action_type = 'task'
+          AND DATE(tl.timestamp) = ?
+          AND tl.amount > 0
+        ORDER BY tl.timestamp ASC
+    `).all(req.params.childId, today);
+
+    // Get all available tasks for this child to calculate max possible points
+    const availableTasks = db.prepare(`
+        SELECT ta.points
+        FROM task_assignments ta
+        WHERE ta.child_id = ?
+    `).all(req.params.childId);
+
+    const maxPoints = availableTasks.reduce((sum, task) => sum + task.points, 0);
+
+    // Group by category
+    const categoryMap = {
+        morning: { name: 'morning', icon: '🌄', points: 0, taskCount: 0, tasks: [] },
+        afternoon: { name: 'afternoon', icon: '☀', points: 0, taskCount: 0, tasks: [] },
+        evening: { name: 'evening', icon: '🌙', points: 0, taskCount: 0, tasks: [] },
+        other: { name: 'other', icon: '📌', points: 0, taskCount: 0, tasks: [] }
+    };
+
+    let totalPoints = 0;
+    let totalTasks = 0;
+
+    transactions.forEach(tx => {
+        const category = categoryMap[tx.task_category];
+        if (category) {
+            category.points += tx.points;
+            category.taskCount++;
+            category.tasks.push({
+                id: tx.task_assignment_id,
+                name: tx.task_name,
+                image: tx.task_image,
+                points: tx.points,
+                completedAt: tx.completed_at,
+                transactionId: tx.transaction_id,
+                isReviewed: tx.is_reviewed === 1
+            });
+            totalPoints += tx.points;
+            totalTasks++;
+        }
+    });
+
+    res.json({
+        date: today,
+        childId: parseInt(req.params.childId),
+        totalPoints,
+        totalTasks,
+        maxPoints,
+        categories: Object.values(categoryMap).filter(cat => cat.taskCount > 0)
+    });
 });
 
 app.post('/api/transactions', (req, res) => {
@@ -445,10 +518,11 @@ app.post('/api/import', (req, res) => {
 
             // Import tasks
             const insertTask = db.prepare(
-                'INSERT INTO task_catalog (id, name, category, icon, completion_type, created_at) VALUES (?, ?, ?, ?, ?, ?)'
+                'INSERT INTO task_catalog (id, name, category, image, completion_type, created_at) VALUES (?, ?, ?, ?, ?, ?)'
             );
             data.data.tasks.forEach(task => {
-                insertTask.run(task.id, task.name, task.category, task.icon, task.completion_type, task.created_at);
+                const taskImage = task.image || task.icon;
+                insertTask.run(task.id, task.name, task.category, taskImage, task.completion_type, task.created_at);
             });
 
             // Import rewards
@@ -456,7 +530,9 @@ app.post('/api/import', (req, res) => {
                 'INSERT INTO rewards (id, name, cost, image, created_at) VALUES (?, ?, ?, ?, ?)'
             );
             data.data.rewards.forEach(reward => {
-                insertReward.run(reward.id, reward.name, reward.cost, reward.image, reward.created_at);
+                // Support for both new 'image' field and old 'icon' field for backward compatibility
+                const rewardImage = reward.image || reward.icon;
+                insertReward.run(reward.id, reward.name, reward.cost, rewardImage, reward.created_at);
             });
 
             // Import assignments

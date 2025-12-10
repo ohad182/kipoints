@@ -1,4 +1,4 @@
-import { ACTION_ICONS } from '../../../config/icons';
+import { renderImage, ACTION_ICONS } from '../../../config/icons';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import './SetupTab.css';
 
@@ -53,7 +53,7 @@ function SetupTab({
                             const taskAssignments = allAssignments.filter(a => a.task_id === task.id);
                             return (
                                 <div key={task.id} className="task-library-item">
-                                    <div 
+                                    <div
                                         className={`task-library-card ${selectedTasks.includes(task.id) ? 'selected' : ''}`}
                                         onClick={() => onToggleTaskSelection(task.id)}
                                     >
@@ -61,7 +61,9 @@ function SetupTab({
                                             {selectedTasks.includes(task.id) && (
                                                 <div className="selection-checkbox">{ACTION_ICONS.task}</div>
                                             )}
-                                            <div className="task-library-icon">{task.icon || ACTION_ICONS.task}</div>
+                                            <div className="task-library-icon">
+                                                {renderImage(task.image, ACTION_ICONS.task, '2em')}
+                                            </div>
                                             <div className="task-library-info">
                                                 <div className="task-library-name">{task.name}</div>
                                                 <div className="task-library-meta">
@@ -71,13 +73,13 @@ function SetupTab({
                                                 </div>
                                             </div>
                                             <div className="task-library-actions">
-                                                <button 
+                                                <button
                                                     className="item-action-btn edit"
                                                     onClick={(e) => { e.stopPropagation(); onEditTask(task); }}
                                                 >
                                                     {ACTION_ICONS.edit}
                                                 </button>
-                                                <button 
+                                                <button
                                                     className="item-action-btn delete"
                                                     onClick={(e) => { e.stopPropagation(); onDeleteTask(task.id); }}
                                                 >
@@ -128,20 +130,22 @@ function SetupTab({
                         {rewards.map(reward => (
                             <div key={reward.id} className="item-card">
                                 <div className="item-actions">
-                                    <button 
-                                        className="item-action-btn edit" 
+                                    <button
+                                        className="item-action-btn edit"
                                         onClick={() => onEditReward(reward)}
                                     >
                                         {ACTION_ICONS.edit}
                                     </button>
-                                    <button 
-                                        className="item-action-btn delete" 
+                                    <button
+                                        className="item-action-btn delete"
                                         onClick={() => onDeleteReward(reward.id)}
                                     >
                                         {ACTION_ICONS.delete}
                                     </button>
                                 </div>
-                                <div className="item-icon">{reward.image || ACTION_ICONS.reward}</div>
+                                <div className="item-icon">
+                                    {renderImage(reward.icon || reward.image, ACTION_ICONS.reward, '2em')}
+                                </div>
                                 <div className="item-name">{reward.name}</div>
                                 <div className="item-info">{reward.cost} {t('parent.points')}</div>
                             </div>

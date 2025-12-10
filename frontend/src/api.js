@@ -40,6 +40,7 @@ export const api = {
     getAssignments: (childId) => fetch(`${getApiUrl()}/assignments/${childId}`).then(res => res.json()),
     getCompletedToday: (childId) => fetch(`${getApiUrl()}/assignments/${childId}/completed-today`).then(res => res.json()),
     getPendingTasks: (childId) => fetch(`${getApiUrl()}/children/${childId}/pending-tasks`).then(res => res.json()),
+    getDailySummary: (childId) => fetch(`${getApiUrl()}/children/${childId}/daily-summary`).then(res => res.json()),
     addAssignment: (data) => fetch(`${getApiUrl()}/assignments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

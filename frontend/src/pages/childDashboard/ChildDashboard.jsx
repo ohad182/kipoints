@@ -9,6 +9,7 @@ import TopBar from './components/TopBar';
 import ViewToggle from './components/ViewToggle';
 import TasksView from './components/TasksView';
 import RewardsView from './components/RewardsView';
+import DailySummaryBar from './components/DailySummaryBar';
 import './ChildDashboard.css';
 
 function ChildDashboard() {
@@ -49,6 +50,7 @@ function ChildDashboard() {
     const [activeCategory, setActiveCategory] = useState(getTimeBasedCategory);
     const [view, setView] = useState('tasks'); // 'tasks' or 'rewards'
     const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
+    const [summaryTrigger, setSummaryTrigger] = useState(0); // Trigger for daily summary refresh
     const { socket } = useSocket();
     const { t } = useLanguage();
     const { showNotification } = useNotification();
@@ -207,6 +209,7 @@ function ChildDashboard() {
         }));
 
         showNotification(t('child.taskCompleted', { points: task.points }), 'success');
+        setSummaryTrigger(prev => prev + 1); // Trigger daily summary refresh
     };
 
     const undoTaskCompletion = async (task) => {
@@ -233,6 +236,7 @@ function ChildDashboard() {
             });
 
             showNotification(t('child.taskUndone'), 'info');
+            setSummaryTrigger(prev => prev + 1); // Trigger daily summary refresh
         } catch (error) {
             console.error('Failed to undo task:', error);
             showNotification(t('child.error'), 'error');
@@ -308,6 +312,12 @@ function ChildDashboard() {
                 onCancel={() => setconfirmDialog({ isopen: false, title: '', message: '', onConfirm: null })}
                 confirmText={t('modal.confirm')}
                 cancelText={t('modal.cancel')}
+            />
+
+            {/* Daily Summary Bar */}
+            <DailySummaryBar
+                childId={parseInt(id)}
+                onUpdate={summaryTrigger}
             />
         </div>
     );

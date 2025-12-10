@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { renderImage, ACTION_ICONS } from '../../../config/icons';
 import { useEscapeKey } from '../../../hooks/useEscapeKey';
 import './Modal.css';
 
@@ -99,7 +100,7 @@ function AssignTaskModal({ isOpen, onClose, onSubmit, onBulkSubmit, children, ta
                   >
                     {child.name}{alreadyAssigned ? ` -- ${t('modal.alreadyAssigned')}` : ''}
                   </option>
-                  );
+                );
               })}
             </select>
           </div>
@@ -110,7 +111,12 @@ function AssignTaskModal({ isOpen, onClose, onSubmit, onBulkSubmit, children, ta
               <div className="selected-tasks-list">
                 {tasks.filter(task => selectedTasks.includes(task.id)).map(task => (
                   <div key={task.id} className="selected-task-item">
-                    <span>{task.icon} {task.name}</span>
+                    <span>
+                      <span style={{ display: 'inline-block', width: '1.2em', height: '1.2em', verticalAlign: 'middle', marginRight: '0.5em' }}>
+                        {renderImage(task.image, ACTION_ICONS.task, '1.2em')}
+                      </span>
+                      {task.name}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -124,11 +130,15 @@ function AssignTaskModal({ isOpen, onClose, onSubmit, onBulkSubmit, children, ta
                 required
               >
                 <option value="">-- {t('modal.selectTask')} --</option>
-                {tasks.map(task => (
-                  <option key={task.id} value={task.id}>
-                    {task.icon} {task.name} ({t(`categories.${task.category}`)})
-                  </option>
-                ))}
+                {tasks.map(task => {
+                  const image = task.image || ACTION_ICONS.task;
+                  const displayIcon = (image && (image.startsWith('data:') || image.startsWith('http'))) ? '🖼️' : image;
+                  return (
+                    <option key={task.id} value={task.id}>
+                      {displayIcon} {task.name} ({t(`categories.${task.category}`)})
+                    </option>
+                  );
+                })}
               </select>
             </div>
           )}

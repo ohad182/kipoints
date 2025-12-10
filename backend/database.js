@@ -22,7 +22,7 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     category TEXT CHECK(category IN ('morning', 'afternoon', 'evening', 'other')),
-    icon TEXT,
+    image TEXT,
     completion_type TEXT CHECK(completion_type IN ('once', 'multiple')) DEFAULT 'once',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );

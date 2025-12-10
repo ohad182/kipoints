@@ -1,4 +1,20 @@
 // Centralized icon configuration
+import React from 'react';
+
+/**
+ * Renders an image/icon - handles both emoji icons and uploaded images.
+ * @param {string} imageOrIcon - The image data URL or icon emoji
+ * @param {string} defaultImage - Default image if imageOrIcon is empty
+ * @param {string} size - CSS size (e.g., '1.5em', '3em', '2em')
+ * @returns {JSX.Element|string} - Either an img element or emoji string
+ */
+export const renderImage = (imageOrIcon, defaultImage, size = '2em') => {
+    const image = imageOrIcon || defaultImage;
+    if (image && (image.startsWith('data:') || image.startsWith('http'))) {
+        return <img src={image} alt="" style={{ width: size, height: size, objectFit: 'contain' }} />;
+    }
+    return image;
+};
 
 export const TASK_ICONS = {
     brushTeeth: '🦷',
