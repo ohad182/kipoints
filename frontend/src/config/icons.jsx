@@ -57,8 +57,9 @@ export const TASK_ICONS = {
     generalTask: '✔️',
     study: '🧠',
     poop: '💩',
-    table: '🍴'
-
+    table: '🍴',
+    taste: '👅',
+    taste2: '😝'
 };
 
 export const REWARD_ICONS = {

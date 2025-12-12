@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { renderImage, CATEGORY_ICONS, ACTION_ICONS } from '../../../config/icons';
+import { Confetti, FloatingEmojis, Fireworks, FallingEmoji, FlyingEmoji } from '../../../components/celebrations';
 import './TasksView.css';
 
 function TasksView({
@@ -9,9 +11,11 @@ function TasksView({
     completedToday,
     pendingTasks,
     onCompleteTask,
-    onUndoTask
+    onUndoTask,
+    childImage
 }) {
     const { t } = useLanguage();
+    const [celebration, setCelebration] = useState(null);
 
     const categories = [
         { id: 'morning', icon: CATEGORY_ICONS.morning, label: t('categories.morning'), time: '5:00 AM - 11:59 AM' },
@@ -21,6 +25,29 @@ function TasksView({
     ];
 
     const currentTasks = tasks[activeCategory] || [];
+
+    // Check for category completion
+    useEffect(() => {
+        if (!currentTasks.length) return;
+
+        const completedCount = currentTasks.filter(task =>
+            task.completion_type === 'once' && completedToday[task.id]
+        ).length;
+
+        // Only trigger celebration if all tasks in category are completed
+        if (completedCount === currentTasks.length && completedCount > 0 && !celebration) {
+            // setCelebration('emojis'); // or 'confetti' or 'emojis' based on preference
+            const celebrations = {
+                morning: 'emojis',
+                afternoon: 'confetti',
+                evening: 'falling',
+                other: 'flying'
+            };
+            //setCelebration(celebrations[activeCategory] || 'confetti');
+            // setCelebration('falling');
+            setCelebration('flying');
+        }
+    }, [completedToday, activeCategory, currentTasks, celebration]);
 
     return (
         <div className="tasks-view">
@@ -85,6 +112,23 @@ function TasksView({
                     </div>
                 )}
             </div>
+
+            {/* Celebrations */}
+            {celebration === 'confetti' && (
+                <Confetti onComplete={() => setCelebration(null)} />
+            )}
+            {celebration === 'emojis' && (
+                <FloatingEmojis category={activeCategory} onComplete={() => setCelebration(null)} />
+            )}
+            {celebration === 'fireworks' && (
+                <Fireworks onComplete={() => setCelebration(null)} />
+            )}
+            {celebration === 'falling' && (
+                <FallingEmoji emoji={childImage} onComplete={() => setCelebration(null)} />
+            )}
+            {celebration === 'flying' && (
+                <FlyingEmoji emoji={childImage} onComplete={() => setCelebration(null)} />
+            )}
         </div>
     );
 }

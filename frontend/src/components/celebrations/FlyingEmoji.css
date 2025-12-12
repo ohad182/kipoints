@@ -1,0 +1,62 @@
+@keyframes emoji-fly-left {
+    0% {
+        left: -100px;
+        transform: translateY(0) scaleX(1);
+    }
+
+    25% {
+        transform: translateY(-30px) scaleX(1);
+    }
+
+    50% {
+        transform: translateY(0) scaleX(1);
+    }
+
+    75% {
+        transform: translateY(-30px) scaleX(1);
+    }
+
+    100% {
+        left: calc(100vw + 100px);
+        transform: translateY(0) scaleX(1);
+    }
+}
+
+@keyframes emoji-fly-right {
+    0% {
+        right: -100px;
+        transform: translateY(0) scaleX(-1);
+    }
+
+    25% {
+        transform: translateY(-30px) scaleX(-1);
+    }
+
+    50% {
+        transform: translateY(0) scaleX(-1);
+    }
+
+    75% {
+        transform: translateY(-30px) scaleX(-1);
+    }
+
+    100% {
+        right: calc(100vw + 100px);
+        transform: translateY(0) scaleX(-1);
+    }
+}
+
+.celebration-emoji {
+    position: fixed;
+    font-size: 4rem;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.celebration-emoji.from-left {
+    animation: emoji-fly-left 4s ease-in-out forwards;
+}
+
+.celebration-emoji.from-right {
+    animation: emoji-fly-right 4s ease-in-out forwards;
+}

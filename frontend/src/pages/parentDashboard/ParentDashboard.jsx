@@ -80,12 +80,12 @@ function ParentDashboard() {
 
         socket.on('childAdded', () => loadChildren());
         socket.on('taskAdded', () => loadTasks());
-        socket.on('rewardAdded', () => loadRewards());
         socket.on('childUpdated', () => loadChildren());
         socket.on('taskUpdated', () => loadTasks());
-        socket.on('rewardUpdated', () => loadRewards());
         socket.on('childDeleted', () => loadChildren());
         socket.on('taskDeleted', () => loadTasks());
+        socket.on('rewardAdded', () => loadRewards());
+        socket.on('rewardUpdated', () => loadRewards());
         socket.on('rewardDeleted', () => loadRewards());
         socket.on('assignmentAdded', () => loadAllAssignments());
         socket.on('assignmentUpdated', () => loadAllAssignments());
@@ -101,13 +101,13 @@ function ParentDashboard() {
             socket.off('transactionReviewed');
             socket.off('transactionDeleted');
             socket.off('childAdded');
-            socket.off('taskAdded');
             socket.off('childUpdated');
-            socket.off('taskUpdated');
-            socket.off('rewardUpdated');
             socket.off('childDeleted');
+            socket.off('taskAdded');
+            socket.off('taskUpdated');
             socket.off('taskDeleted');
             socket.off('rewardAdded');
+            socket.off('rewardUpdated');
             socket.off('rewardDeleted');
             socket.off('assignmentAdded');
             socket.off('assignmentUpdated');
@@ -293,7 +293,7 @@ function ParentDashboard() {
     };
 
     const deleteReward = async (id) => {
-        setconfirmDialog({
+        setConfirmDialog({
             message: t('confirm.deleteReward'),
             onConfirm: async () => {
                 await api.deleteReward(id);
@@ -389,7 +389,8 @@ function ParentDashboard() {
                     setConfirmDialog(null);
                 }
             },
-            onCancel: () => setConfirmDialog(null)
+            onCancel: () => setConfirmDialog(null),
+            confirmColor: 'success'
         });
     };
 
@@ -592,6 +593,7 @@ function ParentDashboard() {
                 message={confirmDialog?.message}
                 onConfirm={confirmDialog?.onConfirm}
                 onCancel={confirmDialog?.onCancel}
+                confirmColor={confirmDialog?.confirmColor}
                 confirmText={t('modal.confirm')}
                 cancelText={t('modal.cancel')}
             />

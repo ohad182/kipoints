@@ -133,6 +133,18 @@ function ChildDashboard() {
             }
         });
 
+        socket.on('rewardAdded', (newReward) => {
+            setRewards(prev => [...prev, newReward]);
+        });
+
+        socket.on('rewardUpdated', (updatedReward) => {
+            setRewards(prev => prev.map(r => r.id === updatedReward.id ? updatedReward : r));
+        });
+
+        socket.on('rewardDeleted', (rewardId) => {
+            setRewards(prev => prev.filter(r => r.id !== rewardId));
+        });
+
         return () => {
             socket.off('transactionAdded');
             socket.off('transactionReviewed');
@@ -140,6 +152,9 @@ function ChildDashboard() {
             socket.off('assignmentUpdated');
             socket.off('assignmentDeleted');
             socket.off('childUpdated');
+            socket.off('rewardAdded');
+            socket.off('rewardUpdated');
+            socket.off('rewardDeleted');
         };
     }, [socket, id]);
 
@@ -164,6 +179,15 @@ function ChildDashboard() {
             other: assignments.filter(a => a.category === 'other')
         };
         setTasks(grouped);
+    };
+
+    const loadRewards = async () => {
+        try {
+            const rewardsData = await api.getRewards();
+            setRewards(rewardsData);
+        } catch (error) {
+            console.error('Failed to load rewards:', error);
+        }
     };
 
     const loadAllChildren = async () => {
@@ -293,6 +317,7 @@ function ChildDashboard() {
                         pendingTasks={pendingTasks}
                         onCompleteTask={completeTask}
                         onUndoTask={undoTaskCompletion}
+                        childImage={child?.image}
                     />
                 ) : (
                     <RewardsView

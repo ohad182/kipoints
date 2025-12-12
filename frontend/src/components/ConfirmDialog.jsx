@@ -1,8 +1,12 @@
 import { ACTION_ICONS } from '../config/icons';
 import './ConfirmDialog.css';
 
-function ConfirmDialog({ isOpen, title, message, onConfirm, onCancel, confirmText = 'Confirm', cancelText = 'Cancel' }) {
+function ConfirmDialog({ isOpen, title, message, onConfirm, onCancel, confirmColor, confirmText = 'Confirm', cancelText = 'Cancel' }) {
     if (!isOpen) return null;
+
+    if (!confirmColor) {
+        confirmColor = 'confirm';
+    }
 
     return (
         <div className="confirm-overlay" onClick={onCancel}>
@@ -14,7 +18,7 @@ function ConfirmDialog({ isOpen, title, message, onConfirm, onCancel, confirmTex
                     <button className="confirm-button cancel" onClick={onCancel}>
                         {cancelText}
                     </button>
-                    <button className="confirm-button confirm" onClick={onConfirm}>
+                    <button className={`confirm-button ${confirmColor}`} onClick={onConfirm}>
                         {confirmText}
                     </button>
                 </div>

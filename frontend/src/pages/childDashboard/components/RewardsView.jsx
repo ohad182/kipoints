@@ -26,7 +26,7 @@ function RewardsView({ rewards, childBalance, onBuyReward }) {
                                 >
                                     <div className="reward-card-content">
                                         <div className="reward-image-large">
-                                            {renderImage(reward.image, ACTION_ICONS.reward, '3em')}
+                                            {renderImage(reward.image, ACTION_ICONS.reward, '1.5em')}
                                         </div>
                                         <div className="reward-name">{reward.name}</div>
                                         <div className={`reward-cost ${!canAfford ? 'too-expensive' : ''}`}>

@@ -97,6 +97,15 @@
     color: white;
 }
 
+.confirm-button.success {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+}
+
+.confirm-button.success:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
 .confirm-button.confirm:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
