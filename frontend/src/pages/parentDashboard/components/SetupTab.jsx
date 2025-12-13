@@ -1,8 +1,10 @@
 import { renderImage, ACTION_ICONS } from '../../../config/icons';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import ChildPreferencesTab from './ChildPreferencesTab';
 import './SetupTab.css';
 
 function SetupTab({
+    children,
     tasks,
     rewards,
     allAssignments,
@@ -16,12 +18,23 @@ function SetupTab({
     onDeleteAssignment,
     onEditReward,
     onDeleteReward,
-    onAddReward
+    onAddReward,
+    onSavePreferences,
+    onEditChildPrefs
 }) {
     const { t } = useLanguage();
 
     return (
         <div className="setup-section">
+            {/* Child Preferences Section */}
+            <div className="setup-subsection">
+                <ChildPreferencesTab
+                    children={children}
+                    onSavePreferences={onSavePreferences}
+                    onEditChildPrefs={onEditChildPrefs}
+                />
+            </div>
+
             {/* Tasks Section */}
             <div className="setup-subsection">
                 <div className="setup-subsection-header">

@@ -45,7 +45,11 @@
         },
         "setup": {
             "taskLibrary": "ספריית משימות",
-            "assignedTo": "משויך ל"
+            "assignedTo": "משויך ל",
+            "childPreferences": "העדפות תצוגה לילד",
+            "editPreferencesFor": "עריכת העדפות עבור {name}",
+            "animation": "אנימציה",
+            "emoji": "אימוג'י"
         },
         "addChild": "הוסף ילד +",
         "addTask": "הוסף משימה +",
@@ -198,7 +202,8 @@
         "pointsAdjusted": "הנקודות הותאמו בהצלחה!",
         "transactionDeleted": "הטרנזקציה נמחקה בהצלחה",
         "transactionDeleteError": "לא ניתן למחוק טרנזקציות שלא נבדקו",
-        "error": "אירעה שגיאה"
+        "error": "אירעה שגיאה",
+        "preferencesSaved": "ההעדפות נשמרו בהצלחה!"
     },
     "backup": {
         "export": "ייצוא נתונים",
@@ -219,6 +224,9 @@
     },
     "buttons": {
         "updatePoints": "עדכן נקודות",
-        "deleteAssignment": "מחק שיוך"
+        "deleteAssignment": "מחק שיוך",
+        "edit": "עריכה",
+        "save": "שמור",
+        "cancel": "ביטול"
     }
 }

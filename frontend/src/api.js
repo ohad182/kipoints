@@ -20,6 +20,14 @@ export const api = {
         method: 'DELETE'
     }).then(res => res.json()),
 
+    // Child Preferences API
+    getChildPreferences: (childId) => fetch(`${getApiUrl()}/children/${childId}/preferences`).then(res => res.json()),
+    updateChildPreferences: (childId, preferences) => fetch(`${getApiUrl()}/children/${childId}/preferences`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(preferences)
+    }).then(res => res.json()),
+
     // Task Catalog API
     getTasks: () => fetch(`${getApiUrl()}/tasks`).then(res => res.json()),
     addTask: (data) => fetch(`${getApiUrl()}/tasks`, {

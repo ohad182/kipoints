@@ -10,6 +10,8 @@ import ViewToggle from './components/ViewToggle';
 import TasksView from './components/TasksView';
 import RewardsView from './components/RewardsView';
 import DailySummaryBar from './components/DailySummaryBar';
+import { useChildPreferences } from '../../hooks/useChildPreferences';
+import DynamicCelebration from './components/DynamicCelebration';
 import './ChildDashboard.css';
 
 function ChildDashboard() {
@@ -21,6 +23,8 @@ function ChildDashboard() {
     const [rewards, setRewards] = useState([]);
     const [completedToday, setCompletedToday] = useState({});
     const [pendingTasks, setPendingTasks] = useState({}); // Track pending (unreviewed) task transactions
+    const [childPreferences, updateChildPreferences] = useChildPreferences(id);
+    const [celebrationProps, setCelebrationProps] = useState(null);
 
     // Apply theme to body element based on child gender
     useEffect(() => {
@@ -58,7 +62,18 @@ function ChildDashboard() {
     useEffect(() => {
         loadData();
         loadAllChildren();
+        loadPreferences();
     }, [id]);
+
+    const loadPreferences = async () => {
+        try {
+            const prefs = await api.getChildPreferences(id);
+            // Update preferences using the hook
+            updateChildPreferences(prefs);
+        } catch (error) {
+            console.error('Failed to load preferences:', error);
+        }
+    };
 
     useEffect(() => {
         if (!socket) return;
@@ -145,6 +160,13 @@ function ChildDashboard() {
             setRewards(prev => prev.filter(r => r.id !== rewardId));
         });
 
+        socket.on('preferencesUpdated', (data) => {
+            if (data.child_id === parseInt(id)) {
+                // Update preferences using the hook
+                updateChildPreferences(data.preferences);
+            }
+        });
+
         return () => {
             socket.off('transactionAdded');
             socket.off('transactionReviewed');
@@ -155,8 +177,9 @@ function ChildDashboard() {
             socket.off('rewardAdded');
             socket.off('rewardUpdated');
             socket.off('rewardDeleted');
+            socket.off('preferencesUpdated');
         };
-    }, [socket, id]);
+    }, [socket, id, updateChildPreferences]);
 
     const loadData = async () => {
         const [childData, assignments, rewardsData, completedData, pendingData] = await Promise.all([
@@ -232,7 +255,32 @@ function ChildDashboard() {
             [task.id]: transaction.id
         }));
 
-        showNotification(t('child.taskCompleted', { points: task.points }), 'success');
+        // Check if all tasks in the category are now completed
+        const categoryTasks = tasks[task.category] || [];
+        const newCompletedToday = task.completion_type === 'once'
+            ? { ...completedToday, [task.id]: 1 }
+            : completedToday;
+
+        const allTasksCompleted = categoryTasks.every(t =>
+            t.completion_type !== 'once' || newCompletedToday[t.id]
+        );
+
+        // Only trigger celebration if all tasks in category are completed
+        if (allTasksCompleted && categoryTasks.length > 0) {
+            setCelebrationProps({
+                key: Date.now(), // Unique key to re-trigger animation
+                category: task.category,
+                points: task.points,
+            });
+        }
+
+        // every task completion celebrating option
+        // setCelebrationProps({
+        //     key: Date.now(), // Unique key to re-trigger animation
+        //     category: task.category,
+        //     points: task.points,
+        // });
+
         setSummaryTrigger(prev => prev + 1); // Trigger daily summary refresh
     };
 
@@ -296,6 +344,19 @@ function ChildDashboard() {
 
     return (
         <div className={`child-dashboard child-dashboard-${genderTheme}`}>
+            {/* Celebration */}
+            {celebrationProps && (
+                <DynamicCelebration
+                    key={celebrationProps.key}
+                    preferences={childPreferences}
+                    category={celebrationProps.category}
+                    onComplete={() => {
+                        showNotification(t('child.taskCompleted', { points: celebrationProps.points }), 'success');
+                        setCelebrationProps(null);
+                    }}
+                />
+            )}
+
             {/* Top Bar */}
             <TopBar
                 child={child}

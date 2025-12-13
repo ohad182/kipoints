@@ -45,7 +45,11 @@
         },
         "setup": {
             "taskLibrary": "Task Library",
-            "assignedTo": "Assigned to"
+            "assignedTo": "Assigned to",
+            "childPreferences": "Child UI Preferences",
+            "editPreferencesFor": "Edit Preferences for {name}",
+            "animation": "Animation",
+            "emoji": "Emoji"
         },
         "addChild": "+ Add Child",
         "addTask": "+ Add Task",
@@ -198,7 +202,8 @@
         "pointsAdjusted": "Points adjusted successfully!",
         "transactionDeleted": "Transaction deleted successfully",
         "transactionDeleteError": "Cannot delete unreviewed transactions",
-        "error": "An error occurred"
+        "error": "An error occurred",
+        "preferencesSaved": "Preferences saved successfully!"
     },
     "backup": {
         "export": "Export Data",
@@ -219,6 +224,9 @@
     },
     "buttons": {
         "updatePoints": "Update Points",
-        "deleteAssignment": "Delete Assignment"
+        "deleteAssignment": "Delete Assignment",
+        "edit": "Edit",
+        "save": "Save",
+        "cancel": "Cancel"
     }
 }

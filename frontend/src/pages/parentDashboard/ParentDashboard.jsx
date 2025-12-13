@@ -12,17 +12,20 @@ import AddRewardModal from './modals/AddRewardModal';
 import AssignTaskModal from './modals/AssignTaskModal';
 import PenaltyModal from './modals/PenaltyModal';
 import AdjustPointsModal from './modals/AdjustPointsModal';
+import ChildPreferencesModal from './modals/ChildPreferencesModal';
 import DashboardTab from './components/DashboardTab';
 import SetupTab from './components/SetupTab';
 import ReviewTab from './components/ReviewTab';
 import HistoryTab from './components/HistoryTab';
 import BackupTab from './components/BackupTab';
+import { useAllChildPreferences } from '../../hooks/useChildPreferences';
 import './ParentDashboard.css';
 
 function ParentDashboard() {
     const navigate = useNavigate();
     const { t } = useLanguage();
     const { showNotification } = useNotification();
+    const { updateAllPreferences } = useAllChildPreferences();
     const [activeTab, setActiveTab] = useState(() => {
         return localStorage.getItem('parentDashboardTab') || 'dashboard';
     });
@@ -49,6 +52,7 @@ function ParentDashboard() {
     const [editChild, setEditChild] = useState(null);
     const [editTask, setEditTask] = useState(null);
     const [editReward, setEditReward] = useState(null);
+    const [editingChildPrefs, setEditingChildPrefs] = useState(null);
 
     // Save active tab to localStorage whenever it changes
     useEffect(() => {
@@ -91,6 +95,17 @@ function ParentDashboard() {
         socket.on('assignmentUpdated', () => loadAllAssignments());
         socket.on('assignmentDeleted', () => loadAllAssignments());
 
+        socket.on('preferencesUpdated', (data) => {
+            console.log('socket: preferences updated', data);
+            // This is a bit of a hack, but we need to update localStorage
+            // when another client changes the preferences.
+            const setPreferencesInStorage = (childId, preferences) => {
+                localStorage.setItem(`child-preferences-${childId}`, JSON.stringify(preferences));
+            };
+            setPreferencesInStorage(data.child_id, data.preferences);
+            loadChildren();
+        });
+
         socket.on('dataImported', () => {
             // Reload all data when import happens
             loadData();
@@ -123,6 +138,7 @@ function ParentDashboard() {
         try {
             const data = await api.getChildren();
             setChildren(data);
+            updateAllPreferences(data); // Update localStorage
         } catch (error) {
             console.error('Error loading children:', error);
         }
@@ -363,6 +379,17 @@ function ParentDashboard() {
         });
     };
 
+    const handleSavePreferences = async (childId, preferences) => {
+        try {
+            await api.updateChildPreferences(childId, preferences);
+            showNotification(t('alerts.preferencesSaved'), 'success');
+            loadChildren(); // Reload children to get updated preferences
+            setEditingChildPrefs(null); // Close the modal
+        } catch (error) {
+            showNotification(t('alerts.error'), 'error');
+        }
+    };
+
     const reviewTransaction = async (id, approved) => {
         await api.reviewTransaction(id, approved);
     };
@@ -498,6 +525,7 @@ function ParentDashboard() {
                 {/* Setup Tab */}
                 {activeTab === 'setup' && (
                     <SetupTab
+                        children={children}
                         tasks={tasks}
                         rewards={rewards}
                         allAssignments={allAssignments}
@@ -512,6 +540,8 @@ function ParentDashboard() {
                         onEditReward={(reward) => { setEditReward(reward); setShowAddReward(true); }}
                         onDeleteReward={deleteReward}
                         onAddReward={() => { setEditReward(null); setShowAddReward(true); }}
+                        onSavePreferences={handleSavePreferences}
+                        onEditChildPrefs={setEditingChildPrefs}
                     />
                 )}
 
@@ -586,6 +616,12 @@ function ParentDashboard() {
                     onSave={adjustPoints}
                 />
             )}
+            <ChildPreferencesModal
+                isOpen={!!editingChildPrefs}
+                onClose={() => setEditingChildPrefs(null)}
+                onSave={handleSavePreferences}
+                child={editingChildPrefs}
+            />
 
             {/* Confirm Dialog */}
             <ConfirmDialog

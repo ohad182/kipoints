@@ -61,6 +61,14 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_transactions_child ON transaction_log(child_id);
   CREATE INDEX IF NOT EXISTS idx_transactions_reviewed ON transaction_log(is_reviewed);
 
+  CREATE TABLE IF NOT EXISTS child_ui_preferences (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    child_id INTEGER NOT NULL,
+    key TEXT NOT NULL,
+    value TEXT,
+    FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE,
+    UNIQUE(child_id, key)
+  );
   `);
 
 console.log('Database initialized');

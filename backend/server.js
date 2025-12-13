@@ -23,7 +23,57 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // ===== CHILDREN ROUTES =====
 app.get('/api/children', (req, res) => {
     const children = db.prepare('SELECT * FROM children').all();
+    const preferences = db.prepare('SELECT * FROM child_ui_preferences').all();
+
+    const preferencesByChild = {};
+    preferences.forEach(pref => {
+        if (!preferencesByChild[pref.child_id]) {
+            preferencesByChild[pref.child_id] = {};
+        }
+        preferencesByChild[pref.child_id][pref.key] = pref.value;
+    });
+
+    children.forEach(child => {
+        child.preferences = preferencesByChild[child.id] || {};
+    });
+
     res.json(children);
+});
+
+// ===== CHILD PREFERENCES ROUTES =====
+app.get('/api/children/:id/preferences', (req, res) => {
+    const preferencesList = db.prepare('SELECT key, value FROM child_ui_preferences WHERE child_id = ?').all(req.params.id);
+    const preferences = {};
+    preferencesList.forEach(p => {
+        preferences[p.key] = p.value;
+    });
+    res.json(preferences);
+});
+
+app.patch('/api/children/:id/preferences', (req, res) => {
+    const child_id = req.params.id;
+    const preferences = req.body;
+
+    const upsert = db.prepare(
+        'INSERT INTO child_ui_preferences (child_id, key, value) VALUES (?, ?, ?) ON CONFLICT(child_id, key) DO UPDATE SET value = excluded.value'
+    );
+
+    const transaction = db.transaction(() => {
+        for (const key in preferences) {
+            upsert.run(child_id, key, preferences[key]);
+        }
+    });
+
+    transaction();
+
+    const updatedPreferences = db.prepare('SELECT key, value FROM child_ui_preferences WHERE child_id = ?').all(child_id);
+    const preferencesObj = {};
+    updatedPreferences.forEach(p => {
+        preferencesObj[p.key] = p.value;
+    });
+
+    io.emit('preferencesUpdated', { child_id: parseInt(child_id), preferences: preferencesObj });
+    res.json(preferencesObj);
 });
 
 app.post('/api/children', (req, res) => {
